@@ -43,7 +43,7 @@ router.post('/login', upload.none(), async (req, res) => {
   // 세션에 사용자 정보 저장
   req.session.user = { userId: user.userId, name: user.name };
   console.log('[로그인 성공]', req.session.user); // 세션 정보 확인
-
+  
   res.json({ message: '로그인 성공', user: req.session.user });
 });
 

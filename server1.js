@@ -7,14 +7,28 @@ const Product = require('./models/product');
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const cartRoutes = require('./routes/cartRoutes');
+const Wishlist = require('./models/wishlist'); // ✅ 이 줄 추가!
+
 
 const app = express();
 const PORT = 3000;
 
+//반드시 라우터 보다 먼저 위치
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());  // JSON 전송용(추가)
+
+app.use((req, res, next) => {
+  console.log(`📡 요청 수신됨: ${req.method} ${req.url}`);
+  next();
+});
+
+
+
+const wishlistRouter = require('./routes/wishlist');
+app.use('/api/wishlist', wishlistRouter);
+
 // MongoDB 연결
-mongoose.connect('mongodb+srv://cd1:capstonedesign1@cluster0.snijqi4.mongodb.net/shopdb?retryWrites=true&w=majority&appName=Cluster0', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+mongoose.connect('mongodb+srv://wsx03sd:jayoung038@cluster0.xh5fwpe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
 }).then(() => console.log('✅ MongoDB 연결 완료'))
   .catch(err => console.error('❌ MongoDB 연결 실패:', err));
 
@@ -24,6 +38,18 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
 });
 const upload = multer({ storage });
+
+
+// ✅ 정확한 라우트 (userId 받아서 찜 목록 조회)(추가)
+app.get('/api/wishlist/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const wishlist = await Wishlist.find({ userId });
+  res.json(wishlist);
+});
+
+
+
+
 
 // 세션 설정
 app.use(session({
@@ -37,7 +63,6 @@ app.use(session({
 app.use(express.urlencoded({extended: true}));  // form 전송용
 
 // 미들웨어
-app.use(express.json());  // JSON 전송용
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/css', express.static(path.join(__dirname, 'Css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));

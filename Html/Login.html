@@ -83,36 +83,31 @@
         </div>
         <script>
             document.getElementById('login-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const form = e.target;
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
 
-                const formData = new FormData(form);
-                // const userId = formData.get('userId');
-                // const password = formData.get('password');
-                // const remember = document.getElementById('remember-check').checked;
-
-                // '아이디 기억하기'가 체크되어 있으면 저장
-                // if (remember) {
-                //     localStorage.setItem('rememberedUserId', userId);
-                // } else {
-                //     localStorage.removeItem('rememberedUserId');
-                // }
-
-                const res = await fetch('/api/auth/login', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 body: formData
-                });
+            });
 
-                const data = await res.json();
-                console.log('[로그인 응답]', data);
+            const data = await res.json();
+            console.log('[로그인 응답]', data);
 
-                if (res.ok) {
+            if (res.ok) {
+                // ✅ 로그인 성공 시 사용자 정보 저장
+                localStorage.setItem("user", JSON.stringify(data));
+                localStorage.setItem("isLogin", "true");
+                localStorage.setItem('userId', data.user.userId);
+
                 alert('로그인 성공!');
                 window.location.href = 'home.html'; // 로그인 성공 시 홈으로 이동
-                } else {
+            } else {
                 alert('로그인 실패: ' + data.message);
-                }
-            });
+            }
+        });
+
 
             // 페이지 열릴 때 localStorage에서 아이디 불러오기
             // window.addEventListener('DOMContentLoaded', () => {

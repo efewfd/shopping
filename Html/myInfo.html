@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MY 정보</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f6f6f6;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px;
+      background: #fff;
+    }
+    header {
+      text-align: center;
+      font-size: 24px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .main-section {
+      display: flex;
+      margin-top: 30px;
+    }
+    .side-menu {
+      width: 150px;
+      border: 1px solid #ccc;
+      margin-right: 30px;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .side-menu li {
+      padding: 12px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+    .side-menu li.active {
+      background-color: #fbb;
+      font-weight: bold;
+    }
+    .content {
+      flex: 1;
+    }
+    .user-info {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 20px;
+    }
+    .user-info p {
+      margin: 4px 0;
+    }
+    .edit-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      background-color: #bbb;
+      color: #fff;
+      cursor: pointer;
+    }
+    .section {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .wishlist-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>MY Page</header>
+    <div class="main-section">
+      <aside class="side-menu">
+        <ul>
+          <li class="active">MY 정보</li>
+          <li><a href="cart.html">장바구니</a></li>
+          <li><a href="delivery.html">배송조회</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="#">1:1 문의</a></li>
+        </ul>
+      </aside>
+
+      <section class="content">
+        <div class="user-info">
+          <p><strong>안녕하세요, ○○○님</strong></p>
+          <p>이메일: abc@abc.com</p>
+          <button class="edit-btn">회원정보 수정</button>
+        </div>
+
+        <div class="section">
+          <div class="section-title">최근 결제 내역</div>
+          <p>내용 없음</p>
+        </div>
+
+        <div class="section">
+          <div class="section-title">찜한 상품</div>
+          <div id="wishlist-container">불러오는 중...</div>
+<script>
+  window.addEventListener("DOMContentLoaded", async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/wishlist/${userId}`);
+      if (!res.ok) throw new Error("404 or Server Error");
+      const wishlist = await res.json();
+
+      console.log("✅ 받아온 wishlist:", wishlist);
+
+      const container = document.getElementById("wishlist-container");
+      if (!wishlist.length) {
+        container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
+        return;
+      }
+
+      container.innerHTML = wishlist.map(item => {
+        console.log('🖼 이미지 파일명:', item.product.image); // ← 이 위치로 이동
+        return `
+          <div class="wishlist-item">
+            <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; vertical-align: middle;" />
+            <strong>${item.product.title}</strong> (${item.product.price.toLocaleString()}원)
+          </div>
+        `;
+      }).join('');
+    } catch (error) {
+      console.error("찜 목록 불러오기 실패:", error);
+    }
+  });
+</script>
+
+        </div>
+
+      </section>
+    </div>
+  </div>
+</body>
+</html>
