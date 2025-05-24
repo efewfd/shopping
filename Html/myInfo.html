@@ -4,81 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MY 정보</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f6f6f6;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 30px;
-      background: #fff;
-    }
-    header {
-      text-align: center;
-      font-size: 24px;
-      padding: 10px 0;
-      border-bottom: 1px solid #ddd;
-    }
-    .main-section {
-      display: flex;
-      margin-top: 30px;
-    }
-    .side-menu {
-      width: 150px;
-      border: 1px solid #ccc;
-      margin-right: 30px;
-    }
-    .side-menu ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .side-menu li {
-      padding: 12px;
-      border-bottom: 1px solid #ccc;
-      text-align: center;
-    }
-    .side-menu li.active {
-      background-color: #fbb;
-      font-weight: bold;
-    }
-    .content {
-      flex: 1;
-    }
-    .user-info {
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 20px;
-    }
-    .user-info p {
-      margin: 4px 0;
-    }
-    .edit-btn {
-      margin-top: 10px;
-      padding: 8px 12px;
-      border: none;
-      background-color: #bbb;
-      color: #fff;
-      cursor: pointer;
-    }
-    .section {
-      margin-top: 30px;
-      border-top: 1px solid #ccc;
-      padding-top: 20px;
-    }
-    .section-title {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .wishlist-item {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-  </style>
+  <link href="../Css/home.css" rel="stylesheet" />
+  <link href="../Css/myInfo.css" rel="stylesheet" />
 </head>
 <body>
+    <div class="Navbar">
+    <h1 class="logo"><a href="home.html">Shopping Mall</a></h1>
+    <ul class="products">
+      <li>
+            <a href="./outerwear/outerwear.html">아우터</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./outerwear/coat.html">코트</a></li>
+                <li><a href="./outerwear/jacket.html">자켓</a></li>
+                <li><a href="./outerwear/cardigan.html">가디건</a></li>
+                <li><a href="./outerwear/vest.html">조끼</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./top/consultation.html">상의</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./top/basic.html">기본</a></li>
+                <li><a href="./top/casual.html">캐주얼</a></li>
+                <li><a href="./top/sweatshirt.html">맨투맨</a></li>
+                <li><a href="./top/hoddie.html">후드티</a></li>
+                <li><a href="./top/shirt.html">셔츠</a></li>
+                <li><a href="./top/blouse.html">블라우스</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./bottom/bottom.html">하의</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./bottom/denim.html">데님</a></li>
+                <li><a href="./bottom/short.html">반바지</a></li>
+                <li><a href="./bottom/cotton.html">코튼</a></li>
+                <li><a href="./bottom/leggings.html">레깅스</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./dress/dress.html">원피스</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./dress/dress-min.html">미니</a></li>
+                <li><a href="./dress/dress-long.html">롱</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./skirt/skirt.html">스커트</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./skirt/skirt-min.html">미니</a></li>
+                <li><a href="./skirt/skirt-long.html">롱</a></li>
+              </ul>
+            </div>
+          </li>
+    </ul>
+    <ul class="listbar">
+    </ul>
+  </div>
   <div class="container">
     <header>MY Page</header>
     <div class="main-section">
@@ -100,13 +89,19 @@
         </div>
 
         <div class="section">
-          <div class="section-title">최근 결제 내역</div>
-          <p>내용 없음</p>
+          <div class="section-title">최근 주문 내역</div>
+          <div id="order-container">불러오는 중...</div>
         </div>
 
         <div class="section">
           <div class="section-title">찜한 상품</div>
           <div id="wishlist-container">불러오는 중...</div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
 <script>
   window.addEventListener("DOMContentLoaded", async () => {
     const userId = localStorage.getItem("userId");
@@ -115,12 +110,11 @@
       return;
     }
 
+    // ✅ 찜한 상품 불러오기
     try {
       const res = await fetch(`/api/wishlist/${userId}`);
       if (!res.ok) throw new Error("404 or Server Error");
       const wishlist = await res.json();
-
-      console.log("✅ 받아온 wishlist:", wishlist);
 
       const container = document.getElementById("wishlist-container");
       if (!wishlist.length) {
@@ -129,10 +123,9 @@
       }
 
       container.innerHTML = wishlist.map(item => {
-        console.log('🖼 이미지 파일명:', item.product.image); // ← 이 위치로 이동
         return `
           <div class="wishlist-item">
-            <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; vertical-align: middle;" />
+            <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; vertical-align: middle;"/>
             <strong>${item.product.title}</strong> (${item.product.price.toLocaleString()}원)
           </div>
         `;
@@ -140,13 +133,37 @@
     } catch (error) {
       console.error("찜 목록 불러오기 실패:", error);
     }
+
+    // ✅ 최근 주문 내역 불러오기
+    try {
+      const orderRes = await fetch(`/api/orders/${userId}`);
+      if (!orderRes.ok) throw new Error("주문 목록 조회 실패");
+      const orders = await orderRes.json();
+
+      const orderContainer = document.getElementById("order-container");
+      if (!orders.length) {
+        orderContainer.innerHTML = "<p>주문 내역이 없습니다.</p>";
+        return;
+      }
+
+      orderContainer.innerHTML = orders.map(order => {
+        const created = new Date(order.createdAt).toLocaleDateString();
+        return `
+          <div class="order-item">
+            <img src="${order.product?.image || '/default.png'}" alt="상품 이미지" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; vertical-align: middle;"/>
+            <div>
+              <p><strong>${order.product?.title || '상품명 없음'}</strong></p>
+              <p>주문일: ${created}</p>
+              <p>수량: ${order.quantity}</p>
+              <p>상태: ${order.status}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error("주문 내역 불러오기 실패:", err);
+    }
   });
 </script>
-
-        </div>
-
-      </section>
-    </div>
-  </div>
 </body>
 </html>

@@ -8,7 +8,7 @@ const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const Wishlist = require('./models/wishlist'); // ✅ 이 줄 추가!
-
+const Order = require('./models/Order');
 
 const app = express();
 const PORT = 3000;
@@ -85,6 +85,10 @@ app.use('/dress', express.static(path.join(__dirname, 'Html', 'dress'))); // 정
 app.use('/outerwear', express.static(path.join(__dirname, 'Html', 'outerwear'))); // 정적으로 처리 -> outerwear 파일 안의 html 자동으로 매핑
 app.use('/skirt', express.static(path.join(__dirname, 'Html', 'skirt'))); // 정적으로 처리 -> skirt 파일 안의 html 자동으로 매핑
 app.use('/', express.static(path.join(__dirname, 'Html'))); // 정적으로 처리 -> Html 파일 안의 html
+// public 폴더 정적 경로 설정
+app.use(express.static('public'));
+//랜럼 이미지 때문에
+app.use('/api/product', productRoutes);
 
 // 관리자 페이지 라우팅
 app.get('/admin', (req, res) => {
@@ -96,5 +100,76 @@ app.get('/admin/manage-products', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`서버 실행 중: http://localhost:${PORT}`);
+});
+
+// POST /api/orders - 주문 저장
+app.post('/api/orders', async (req, res) => {
+  console.log('[📥 주문 도착]', req.body); // 👈 로그 추가
+
+  try {
+    const { userId, productId, quantity, status } = req.body;
+
+    if (!userId || !productId) {
+      console.error('❌ 필수값 누락');
+      return res.status(400).json({ message: 'userId 또는 productId 없음' });
+    }
+
+    const newOrder = new Order({
+      userId,
+      productId,
+      quantity,
+      status,
+      product: req.body.product
+    });
+
+    await newOrder.save(); // ❗ 이 부분에서 Mongoose 에러 가능성 있음
+    res.json(newOrder);
+
+  } catch (err) {
+    console.error('❌ 주문 저장 중 에러:', err.message);
+    res.status(500).json({ message: '서버 오류', error: err.message });
+  }
+});
+
+
+
+// GET /api/orders/:userId - 소비자용 배송조회
+app.get('/api/orders/:userId', async (req, res) => {
+  const orders = await Order.find({ userId: req.params.userId });
+  res.json(orders);
+});
+
+// GET /api/orders - 관리자용 전체 조회
+app.get('/api/orders', async (req, res) => {
+  const orders = await Order.find();
+  res.json(orders);
+});
+
+// PATCH /api/orders/:id - 관리자용 상태 변경
+app.patch('/api/orders/:id', async (req, res) => {
+  const { status } = req.body;
+  const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+  res.json(order);
+});
+
+app.post('/api/orders', async (req, res) => {
+  console.log('[주문 요청 도착]', req.body);
+
+  try {
+    const { userId, productId, quantity, status } = req.body;
+
+    if (!userId || !productId) {
+      console.error("❌ 필수값 누락");
+      return res.status(400).json({ message: "userId 또는 productId 없음" });
+    }
+
+    const newOrder = new Order({ userId, productId, quantity, status });
+    await newOrder.save();
+
+    res.json(newOrder);
+  } catch (err) {
+    console.error("❌ 주문 저장 중 에러:", err);
+    res.status(500).json({ message: "서버 내부 오류", error: err.message });
+  }
 });
 

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주문 관리</title>
+  <link rel="stylesheet" href="../../Css/admin.css" />
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>주문 관리</h1>
+    <nav>
+      <ul>
+        <li><a href="/admin/manage-products.html">상품 관리</a></li>
+        <li><a href="/admin/manage-orders.html">주문 관리</a></li>
+        <li><a href="#">회원 관리</a></li>
+        <li><a href="#">채팅 관리</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h2>전체 주문 목록</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>주문 ID</th>
+          <th>사용자 ID</th>
+          <th>상품 ID</th>
+          <th>수량</th>
+          <th>상태</th>
+          <th>변경</th>
+        </tr>
+      </thead>
+      <tbody id="order-list">
+        <!-- 주문 데이터가 여기에 삽입됩니다 -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const res = await fetch("/api/orders");
+        if (!res.ok) throw new Error("주문 목록 로드 실패");
+        const orders = await res.json();
+
+        const list = document.getElementById("order-list");
+        list.innerHTML = orders.map(order => `
+          <tr>
+            <td>${order._id}</td>
+            <td>${order.userId}</td>
+            <td>${order.productId}</td>
+            <td>${order.quantity}</td>
+            <td>${order.status}</td>
+            <td>
+              <button onclick="updateStatus('${order._id}', '배송중')">배송중</button>
+              <button onclick="updateStatus('${order._id}', '배송완료')">배송완료</button>
+            </td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        alert("주문 목록을 불러오지 못했습니다.");
+        console.error(err);
+      }
+    });
+
+    async function updateStatus(orderId, newStatus) {
+      try {
+        const res = await fetch(`/api/orders/${orderId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (!res.ok) throw new Error("상태 변경 실패");
+        alert("상태가 변경되었습니다.");
+        location.reload();
+      } catch (err) {
+        alert("상태 변경 중 오류 발생");
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>

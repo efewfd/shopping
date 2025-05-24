@@ -63,6 +63,17 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// 랜덤 상품 3개 가져오기
+router.get('/random-products', async (req, res) => {
+  try {
+    const randomProducts = await Product.aggregate([{ $sample: { size: 3 } }]);
+    res.json(randomProducts);
+  } catch (err) {
+    res.status(500).json({ message: '랜덤 상품 조회 실패' });
+  }
+});
+
+
 // 상세 페이지 조회 API
 router.get('/:id', async (req, res) => {
   try {
@@ -72,6 +83,7 @@ router.get('/:id', async (req, res) => {
     res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
   }
 });
+
 
 
 

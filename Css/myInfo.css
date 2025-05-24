@@ -1,0 +1,79 @@
+body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f6f6f6;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px;
+      background: #fff;
+    }
+    header {
+      text-align: center;
+      font-size: 24px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .main-section {
+      display: flex;
+      margin-top: 30px;
+    }
+    .side-menu {
+      width: 150px;
+      border: 1px solid #ccc;
+      margin-right: 30px;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .side-menu li {
+      padding: 12px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+    .side-menu li.active {
+      background-color: #fbb;
+      font-weight: bold;
+    }
+    .content {
+      flex: 1;
+    }
+    .user-info {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 20px;
+    }
+    .user-info p {
+      margin: 4px 0;
+    }
+    .edit-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      background-color: #bbb;
+      color: #fff;
+      cursor: pointer;
+    }
+    .section {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .wishlist-item, .order-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .order-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+    }
