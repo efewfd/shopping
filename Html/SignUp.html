@@ -127,7 +127,15 @@
 
                 const res = await fetch('/api/auth/register', {
                 method: 'POST',
-                body: formData
+                  body: JSON.stringify({
+                    userId: form.userId.value,
+                    password: form.password.value,
+                    name: form.name.value,
+                    email: form.emailPrefix.value + '@' + document.getElementById('email-domain').value
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
                 });
 
                 const data = await res.json();

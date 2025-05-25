@@ -43,12 +43,16 @@
         <tr>
           <th>주문 ID</th>
           <th>사용자 ID</th>
+          <th>회원 이름</th>
           <th>상품 ID</th>
+          <th>상품명</th>
           <th>수량</th>
           <th>상태</th>
+          <th>주문일시</th>
           <th>변경</th>
         </tr>
       </thead>
+
       <tbody id="order-list">
         <!-- 주문 데이터가 여기에 삽입됩니다 -->
       </tbody>
@@ -65,17 +69,21 @@
         const list = document.getElementById("order-list");
         list.innerHTML = orders.map(order => `
           <tr>
-            <td>${order._id}</td>
-            <td>${order.userId}</td>
-            <td>${order.productId}</td>
+            <td>${order.id}</td>
+            <td>${order.user_id}</td>
+            <td>${order.user_name || '-'}</td>
+            <td>${order.product_id}</td>
+            <td>${order.product_name || '-' || order.product_title}</td>
             <td>${order.quantity}</td>
             <td>${order.status}</td>
+            <td>${new Date(order.created_at).toLocaleString()}</td>
             <td>
-              <button onclick="updateStatus('${order._id}', '배송중')">배송중</button>
-              <button onclick="updateStatus('${order._id}', '배송완료')">배송완료</button>
+              <button onclick="updateStatus(${order.id}, '배송중')">배송중</button>
+              <button onclick="updateStatus(${order.id}, '배송완료')">배송완료</button>
             </td>
           </tr>
         `).join("");
+
       } catch (err) {
         alert("주문 목록을 불러오지 못했습니다.");
         console.error(err);

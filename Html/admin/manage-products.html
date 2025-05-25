@@ -20,29 +20,33 @@
   </header>
 
   <main>
-    <section>
-      <h2>신규 상품 등록</h2>
-      <form id="product-form" enctype="multipart/form-data">
-        <select name="category1" required>
-          <option value="">1차 카테고리</option>
-          <option value="top">상의</option>
-          <option value="bottom">하의</option>
-          <option value="outerwear">아우터</option>
-          <option value="dress">원피스</option>
-          <option value="skirt">스커트</option>
-        </select>
+<section>
+  <h2>신규 상품 등록</h2>
+  <form id="product-form" enctype="multipart/form-data">
 
-        <select name="category2" required>
-          <option value="">2차 카테고리</option>
-        </select><br />
+    <select name="category1" required>
+      <option value="">1차 카테고리</option>
+      <option value="top">상의</option>
+      <option value="bottom">하의</option>
+      <option value="outerwear">아우터</option>
+      <option value="dress">원피스</option>
+      <option value="skirt">스커트</option>
+    </select>
 
-        <input type="text" name="name" placeholder="상품명" required /><br />
-        <input type="number" name="price" placeholder="가격" required /><br />
-        <input type="number" name="stock" placeholder="재고" required /><br />
-        <input type="file" name="image" accept="image/*" /><br />
-        <button type="submit">상품 등록</button>
-      </form>
-    </section>
+    <select name="category2" required>
+      <option value="">2차 카테고리</option>
+    </select><br />
+
+<input type="text" name="id" placeholder="상품 ID (선택)" />
+<input type="text" name="name" placeholder="상품명" required />
+<input type="number" name="price" placeholder="가격" required />
+<input type="number" name="stock" placeholder="재고" required />
+<input type="file" name="image" accept="image/*" required />
+<br />
+    <button type="submit">상품 등록</button>
+  </form>
+</section>
+
 
     <section>
       <h2>상품 목록</h2>

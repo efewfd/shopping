@@ -144,7 +144,7 @@
       </div>
 
       <div class="cart-buttons" style="display: none;">
-        <button onclick="submitCheckedOrders()">주문하기</button>
+        <button id="order-button">주문하기</button>
         <button onclick="clearCart()">장바구니 비우기</button>
         <button><a href="./home.html">쇼핑 계속하기</a></button>
       </div>
@@ -165,31 +165,26 @@
       return;
     }
 
-    try {
-      for (const item of cart) {
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId,
-            productId: item.code, // 또는 item.id 등 실제 key에 맞춰 수정
-            quantity: item.quantity,
-            status: "배송준비중"
-          })
-        });
-
-        if (!res.ok) throw new Error("주문 실패");
-      }
-
-      alert("모든 상품이 주문되었습니다!");
-      localStorage.removeItem("cart"); // 장바구니 비우기
-      location.href = "delivery.html"; // 배송조회 페이지로 이동
-
-    } catch (err) {
-      console.error("주문 처리 중 오류:", err);
-      alert("주문 중 오류가 발생했습니다.");
-    }
+    localStorage.setItem("pendingOrders", JSON.stringify(cart));
+    location.href = "checkout.html";
+    
   }
+  document.getElementById("order-button")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  submitCheckedOrders();
+});
+
+// 주문 버튼에 클릭 이벤트 연결
+window.addEventListener('DOMContentLoaded', () => {
+  const orderBtn = document.getElementById("order-button");
+  if (orderBtn) {
+    orderBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      submitCheckedOrders(); // ✅ cart.js 안에 정의되어 있어야 함
+    });
+  }
+});
+
   </script>
 
 

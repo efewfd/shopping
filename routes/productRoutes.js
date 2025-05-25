@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const multer = require('multer');
 const Product = require('../models/product');
+const db = require('../js/db'); // 
+
+
 
 // 이미지 업로드 설정
 const storage = multer.diskStorage({
@@ -31,27 +35,62 @@ router.get('/', async (req, res) => {
 
 
 // 상품 등록
-router.post('/', upload.single('image'), async (req, res) => {
-  try {
-    const { name, price, stock, category1, category2 } = req.body;
+router.post(
+  '/',
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'id' },
+    { name: 'name' },
+    { name: 'price' },
+    { name: 'stock' },
+    { name: 'category1' },
+    { name: 'category2' }
+  ]),
+  async (req, res) => {
+    try {
+      console.log("[폼 데이터 수신]", req.body);
 
-    if (!category2) {
-      return res.status(400).json({ message: '2차 카테고리를 선택하세요.' });
+      const { id, name, price, stock, category1, category2 } = req.body;
+      const parsedPrice = parseInt(price, 10);
+      const parsedStock = parseInt(stock, 10);
+
+      if (!category2) {
+        return res.status(400).json({ message: '2차 카테고리를 선택하세요.' });
+      }
+
+      const image_url = req.files.image ? `/uploads/${req.files.image[0].filename}` : '';
+      const category2List = [category2, 'all'];
+      const productId = id || new mongoose.Types.ObjectId().toHexString();
+
+      const productData = {
+        _id: productId,
+        name,
+        price: parsedPrice,
+        stock: parsedStock,
+        image_url,
+        category1,
+        category2: category2List
+      };
+      const product = new Product(productData);
+      await product.save();
+
+      await db.execute(
+        `INSERT INTO products (id, name, price, image_url, stock, category1, category2)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [productId, name, parsedPrice, image_url, parsedStock, category1, category2]
+      );
+
+      res.json({ message: '상품 등록 완료', product });
+
+    } catch (err) {
+      console.error("❌ 상품 등록 중 오류:", err);
+      res.status(500).json({ message: '상품 등록 실패', error: err.message });
     }
-
-    const image_url = req.file ? `/uploads/${req.file.filename}` : '';
-    const category2List = [category2, 'all'];
-
-    const product = new Product({ name, price, stock, image_url, category1, category2: category2List });
-    await product.save();
-
-    res.json({ message: '상품 등록 완료', product });
-
-  } catch (err) {
-    console.error("❌ 상품 등록 중 오류:", err); // 🔥 여기 추가해야 콘솔에 원인 뜸!
-    res.status(500).json({ message: '상품 등록 실패', error: err.message });
   }
-});
+);
+
+
+
 
 
 // 상품 삭제

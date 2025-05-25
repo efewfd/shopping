@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>결제 페이지</title>
+  <link href="../Css/home.css" rel="stylesheet" />
+  <link href="../Css/cart.css" rel="stylesheet" />
+  <style>
+    #loader {
+      display: none;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>가상 결제 페이지</h2>
+    <div id="order-summary">불러오는 중...</div>
+    <button id="payBtn">결제하기</button>
+    <div id="loader"></div>
+  </div>
+
+<script>
+window.addEventListener("DOMContentLoaded", async () => {
+  const orderSummary = document.getElementById("order-summary");
+  const loader = document.getElementById("loader");
+  const payBtn = document.getElementById("payBtn");
+
+  // ✅ 로그인 확인
+  const sessionRes = await fetch("/api/auth/user", { credentials: "include" });
+  const sessionData = await sessionRes.json();
+  if (!sessionData.loggedIn || !sessionData.user) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "/Login.html";
+    return;
+  }
+  const userId = sessionData.user.userId;
+
+  // ✅ 결제 상품 정보 불러오기
+  const cart = JSON.parse(localStorage.getItem("pendingOrders") || "[]");
+  if (!cart.length) {
+    alert("결제할 상품이 없습니다.");
+    window.location.href = "home.html";
+    return;
+  }
+
+  console.log("✅ 결제용 상품 목록:", cart);
+
+  orderSummary.innerHTML = cart.map(item => `
+    <div>
+      <strong>${item.title || "상품명 없음"}</strong> - 
+      수량: ${item.quantity || 1}개 - 
+      가격: ${(item.price || 0).toLocaleString()}원
+    </div>
+  `).join('');
+
+  // ✅ 결제 버튼 클릭
+  payBtn.addEventListener("click", async () => {
+    loader.style.display = "block";
+    payBtn.disabled = true;
+    payBtn.textContent = "결제 진행 중...";
+
+    try {
+      for (const item of cart) {
+        if (!item.code || !item.quantity) throw new Error("상품 정보 누락");
+
+        console.log("주문 전송 중:", {
+          userId,
+          productId: item.code,
+          quantity: item.quantity,
+          title: item.title
+        });
+
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            userId,
+            productId: item.code,
+            quantity: item.quantity,
+            status: "결제완료",
+            product: {
+              title: item.title || "이름없음",
+              image: item.image || ""
+            }
+          })
+        });
+
+        if (!res.ok) throw new Error("주문 실패");
+      }
+
+      setTimeout(() => {
+        alert("결제가 완료되었습니다!");
+        localStorage.removeItem("cart");
+        localStorage.removeItem("pendingOrders");
+        window.location.href = "delivery.html";
+      }, 1500);
+    } catch (err) {
+      console.error("결제 실패:", err);
+      alert("결제 중 오류가 발생했습니다.");
+      loader.style.display = "none";
+      payBtn.disabled = false;
+      payBtn.textContent = "결제하기";
+    }
+  });
+});
+</script>
+</body>
+</html>

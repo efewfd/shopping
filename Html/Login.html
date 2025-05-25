@@ -82,41 +82,34 @@
             <p class="SingUp-page"><a href="SignUp.html">Sign Up</a></p>
         </div>
         <script>
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                body: formData
-            });
+        const userId = e.target.userId.value;
+        const password = e.target.password.value;
 
-            const data = await res.json();
-            console.log('[로그인 응답]', data);
-
-            if (res.ok) {
-                // ✅ 로그인 성공 시 사용자 정보 저장
-                localStorage.setItem("user", JSON.stringify(data));
-                localStorage.setItem("isLogin", "true");
-                localStorage.setItem('userId', data.user.userId);
-
-                alert('로그인 성공!');
-                window.location.href = 'home.html'; // 로그인 성공 시 홈으로 이동
-            } else {
-                alert('로그인 실패: ' + data.message);
-            }
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json' 
+            },
+            credentials: 'include',
+            body: JSON.stringify({ userId, password })  // JSON으로 보내기
         });
 
+        const data = await res.json();
+        if (res.ok) {
+            console.log('[로그인 성공]', data);
+            localStorage.setItem('userId', data.userId);  // 로그인한 사용자 ID 저장
+            localStorage.setItem('userName', data.name);
+            // 예: localStorage.setItem('userId', data.userId);
+            alert('로그인 성공!');
+            window.location.href = 'home.html';
+        } else {
+            alert('로그인 실패: ' + data.message);
+        }
+        });
 
-            // 페이지 열릴 때 localStorage에서 아이디 불러오기
-            // window.addEventListener('DOMContentLoaded', () => {
-            //     const rememberedUserId = localStorage.getItem('rememberedUserId');
-            //     if (rememberedUserId) {
-            //     document.querySelector('input[name="userId"]').value = rememberedUserId;
-            //     document.getElementById('remember-check').checked = true;
-            //     }
-            // });
         </script>
         <script src="../js/navbar.js"></script>
     </body>

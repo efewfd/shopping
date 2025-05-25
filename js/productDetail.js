@@ -17,8 +17,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // 장바구니/찜용 저장
     window.productForCart = {
+      id: product._id,
       code: product._id, // 찜 토글에서 이 값 사용
-      title: product.name,
+      title: product.name || product.title,
       price: product.price,
       image: product.image_url,
       stock: product.stock
@@ -26,6 +27,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // 이 시점 이후에 버튼 이벤트 연결
   const wishBtn = document.querySelector('.wishlist');
+  if (!window.productForCart) {
+  alert('상품 정보를 불러오는 중입니다.');
+  return;
+}
+
   if (wishBtn) {
     wishBtn.addEventListener("click", () => {
       console.log("✅ 찜 버튼 눌림");
@@ -48,37 +54,56 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // 상품 장바구니에 담기
 function addToCart(product) {
-  console.log('[담기 시도]', product);
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  // 이미 존재하는 상품인지 확인
-  const exists = cart.some(item => item.id === product.id);
-  if (exists) {
+
+  if (cart.some(item => item.id === product.id)) {
     alert('이미 장바구니에 담긴 상품입니다!');
     return;
   }
-  product.quantity = 1; // 수량 초기값 설정
-  cart.push(product);
+
+  const newItem = {
+    id: product.id,
+    code: product.code,
+    title: product.title || product.name,     // ✅ 안전하게 넣기
+    price: product.price,
+    image: product.image,
+    stock: product.stock,
+    quantity: 1
+  };
+
+  cart.push(newItem);
   localStorage.setItem('cart', JSON.stringify(cart));
   alert('장바구니에 담겼습니다!');
 }
+
 
 
 // 장바구니 담기 후 이동
 function addToCartAndGo() {
   const product = window.productForCart;
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  // 이미 있는 상품인지 확인
-  const exists = cart.some(item => item.id === product.id);
-  if (exists) {
+
+  if (cart.some(item => item.id === product.id)) {
     alert('이미 장바구니에 담긴 상품입니다.');
     window.location.href = 'cart.html';
     return;
   }
-  product.quantity = 1; // 수량 초기값 설정
-  cart.push(product);
+
+  const newItem = {
+    id: product.id,
+    code: product.code,
+    title: product.title || product.name,    // ✅ 여기도 추가
+    price: product.price,
+    image: product.image,
+    stock: product.stock,
+    quantity: 1
+  };
+
+  cart.push(newItem);
   localStorage.setItem("cart", JSON.stringify(cart));
   window.location.href = "cart.html";
 }
+
 
 
 // 찜 불러오기
@@ -161,4 +186,7 @@ async function toggleWishlist(product, buttonElement) {
     console.error('찜 처리 실패:', error);
     alert('오류가 발생했습니다.');
   }
-}
+} 
+
+window.addToCart = addToCart;
+window.addToCartAndGo = addToCartAndGo;

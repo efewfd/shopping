@@ -133,50 +133,34 @@ async function submitCheckedOrders() {
     return;
   }
 
-  const checkboxes = document.querySelectorAll(".cart-table.full tbody input[type='checkbox']:checked");
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const checkboxes = document.querySelectorAll(".item-checkbox:checked");
   if (checkboxes.length === 0) {
     alert("주문할 상품을 선택해주세요.");
     return;
   }
 
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const selectedRows = Array.from(checkboxes).map(cb => cb.closest("tr"));
-  const orderedTitles = [];
+  const selectedItems = [];
 
-  try {
-    for (const row of selectedRows) {
-      const title = row.children[2].textContent;
-      const product = cart.find(item => item.title === title); // ✅ 여기 선언 중요!
-      console.log("✅ 전송되는 이미지:", product?.image);
-      if (!product) continue;
-
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          productId: product.code || product.id,
-          quantity: product.quantity,
-          status: "배송준비중",
-          product: {
-            title: product.title,
-            image: product.image
-          }
-        })
-      });
-
-      if (!res.ok) throw new Error("주문 실패");
-      orderedTitles.push(product.title);
+  for (const checkbox of checkboxes) {
+    const row = checkbox.closest("tr");
+    const title = row.children[2].textContent.trim();
+    const product = cart.find(item => item.title === title);
+    if (!product) {
+      console.warn("❗ 상품 못 찾음:", title);
+      continue;
     }
-
-    const updatedCart = cart.filter(item => !orderedTitles.includes(item.title));
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-    alert("선택한 상품이 주문되었습니다!");
-    location.href = "delivery.html";
-
-  } catch (err) {
-    console.error("주문 중 오류:", err);
-    alert("일부 상품 주문에 실패했습니다.");
+    selectedItems.push(product);
   }
+
+  if (selectedItems.length === 0) {
+    alert("선택한 상품 정보를 찾을 수 없습니다.");
+    return;
+  }
+
+  // ✅ 결제용 상품을 localStorage에 저장
+  localStorage.setItem("pendingOrders", JSON.stringify(selectedItems));
+
+  // ✅ 결제 페이지로 이동
+  location.href = "checkout.html";
 }
