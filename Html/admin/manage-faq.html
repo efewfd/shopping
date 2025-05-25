@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>FAQ 관리</title>
+    <link rel="stylesheet" href="../../Css/admin.css" />
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+    }
+    label { display: block; margin-top: 10px; }
+    input, textarea, select { width: 300px; }
+    .faq-item { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    button { margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <header>
+  <h1>주문 관리</h1>
+  <nav>
+    <ul>
+      <li><a href="/admin/manage-products.html">상품 관리</a></li>
+      <li><a href="/admin/manage-orders.html">주문 관리</a></li>
+      <li><a href="#">회원 관리</a></li>
+      <li><a href="/admin/manage-faq.html">faq 관리</a></li>
+      <li><a href="#">채팅 관리</a></li>
+    </ul>
+  </nav>
+  </header>
+  <h2>FAQ 등록</h2>
+  <form id="faq-form">
+    <label>카테고리
+      <select name="category">
+        <option value="회원정보">회원정보</option>
+        <option value="주문/결제">주문/결제</option>
+        <option value="상품/배송">상품/배송</option>
+        <option value="취소/환불">취소/환불</option>
+        <option value="기타">기타</option>
+      </select>
+    </label>
+    <label>질문
+      <input type="text" name="question" required />
+    </label>
+    <label>답변
+      <textarea name="answer" rows="4" required></textarea>
+    </label>
+    <button type="submit">등록</button>
+  </form>
+
+  <h2>FAQ 목록</h2>
+  <div id="faq-list">불러오는 중...</div>
+
+  <script>
+    const form = document.getElementById('faq-form');
+    const list = document.getElementById('faq-list');
+
+    async function loadFaqs() {
+      const res = await fetch('/api/faqs');
+      const faqs = await res.json();
+      list.innerHTML = faqs.map(faq => `
+        <div class="faq-item">
+          <strong>[${faq.category}] ${faq.question}</strong>
+          <p>${faq.answer}</p>
+          <button onclick="deleteFaq('${faq._id}')">삭제</button>
+        </div>
+      `).join('');
+    }
+
+    async function deleteFaq(id) {
+      if (!confirm('정말 삭제할까요?')) return;
+      await fetch(`/api/faqs/${id}`, { method: 'DELETE' });
+      loadFaqs();
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      await fetch('/api/faqs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      form.reset();
+      loadFaqs();
+    });
+
+    window.addEventListener('DOMContentLoaded', loadFaqs);
+  </script>
+</body>
+</html>

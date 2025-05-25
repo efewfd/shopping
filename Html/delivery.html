@@ -69,9 +69,17 @@
     </ul>
   </div>
   <div class="delivery-container">
-    <div class="recommended-box" id="recommended-box">
-      추천 상품 이미지(random)
-    </div>
+<div class="recommended-wrapper">
+  <div class="recommended-title">추천 상품 이미지(random)</div>
+  <div class="recommended-box">
+    <a id="recommend-link" href="#">
+      <img id="recommend-image" src="" alt="추천 이미지" />
+    </a>
+  </div>
+</div>
+
+
+
     <div class="main-section">
       <aside class="side-menu">
         <ul>
@@ -147,27 +155,33 @@
       console.error("배송 현황 로딩 실패:", err);
     }
     // 추천 상품 이미지 로딩
-    try {
-      const res = await fetch('/api/product/random-products');
-      if (!res.ok) throw new Error('추천 상품 로딩 실패');
+  try {
+    const res = await fetch("/api/product/random-products?count=5");
+    const products = await res.json();
+    if (!Array.isArray(products) || products.length === 0) return;
 
-      const products = await res.json();
-      const box = document.getElementById('recommended-box');
-      box.innerHTML = ''; // 초기화
+    const imgElement = document.getElementById("recommend-image");
+    const linkElement = document.getElementById("recommend-link");
+    let index = 0;
 
-      products.forEach(product => {
-        const img = document.createElement('img');
-        img.src = product.image_url;
-        img.alt = product.name;
-        img.style.width = '30%';
-        img.style.margin = '1%';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '8px';
-        box.appendChild(img);
-      });
-    } catch (err) {
-      console.error('추천 상품 로딩 실패:', err);
-    }
+    const updateImage = () => {
+      imgElement.style.opacity = 0;
+      setTimeout(() => {
+        const product = products[index];
+        imgElement.src = product.image_url;
+        imgElement.alt = product.name;
+        linkElement.href = `/productDetail.html?id=${product._id}`; // ✅ 상세페이지 링크 설정
+        imgElement.style.opacity = 1;
+
+        index = (index + 1) % products.length;
+      }, 200);
+    };
+
+    updateImage();
+    setInterval(updateImage, 3000);
+  } catch (err) {
+    console.error("추천 이미지 슬라이드 오류:", err);
+  }
 
   });
 </script>

@@ -12,34 +12,47 @@ const upload = multer({ storage });
 
 // 상품 목록
 router.get('/', async (req, res) => {
-  const { category1, category2 } = req.query;
-  const query = {};
+  try {
+    const { category1, category2 } = req.query;
+    const query = {};
 
-  if (category1) query.category1 = category1;
-  if (category2) query.category2 = { $in: [category2] };  //배열 대응
-  
-  const products = await Product.find(query).sort({ created_at: -1 });
-  res.json(products);
+    if (category1) query.category1 = category1;
+    if (category2) query.category2 = category2;
+
+    console.log('[상품 목록 요청]', req.query, query); // 로그 추가
+
+    const products = await Product.find(query).sort({ created_at: -1 });
+    res.json(products);
+  } catch (err) {
+    console.error('❌ 상품 목록 조회 중 오류:', err);
+    res.status(500).json({ message: '상품 목록 조회 실패', error: err.message });
+  }
 });
+
 
 // 상품 등록
 router.post('/', upload.single('image'), async (req, res) => {
-  const { name, price, stock, category1, category2 } = req.body;
+  try {
+    const { name, price, stock, category1, category2 } = req.body;
 
-  // category2 값이 없으면 에러 응답
-  if (!category2) {
-    return res.status(400).json({ message: '2차 카테고리를 선택하세요.' });
+    if (!category2) {
+      return res.status(400).json({ message: '2차 카테고리를 선택하세요.' });
+    }
+
+    const image_url = req.file ? `/uploads/${req.file.filename}` : '';
+    const category2List = [category2, 'all'];
+
+    const product = new Product({ name, price, stock, image_url, category1, category2: category2List });
+    await product.save();
+
+    res.json({ message: '상품 등록 완료', product });
+
+  } catch (err) {
+    console.error("❌ 상품 등록 중 오류:", err); // 🔥 여기 추가해야 콘솔에 원인 뜸!
+    res.status(500).json({ message: '상품 등록 실패', error: err.message });
   }
-
-  const image_url = req.file ? `/uploads/${req.file.filename}` : '';
-
-  // category2 배열 생성 : 선택한 카테고리 + 'all' 자동 추가
-  const category2List = [category2, 'all'];
-  
-  const product = new Product({ name, price, stock, image_url, category1, category2: category2List });
-  await product.save();
-  res.json({ message: '상품 등록 완료', product });
 });
+
 
 // 상품 삭제
 router.delete('/:id', async (req, res) => {
@@ -66,12 +79,15 @@ router.put('/:id', async (req, res) => {
 // 랜덤 상품 3개 가져오기
 router.get('/random-products', async (req, res) => {
   try {
-    const randomProducts = await Product.aggregate([{ $sample: { size: 3 } }]);
+    const count = parseInt(req.query.count) || 5;
+    const randomProducts = await Product.aggregate([{ $sample: { size: count } }]);
     res.json(randomProducts);
   } catch (err) {
+    console.error('❌ 랜덤 상품 조회 실패:', err);
     res.status(500).json({ message: '랜덤 상품 조회 실패' });
   }
 });
+
 
 
 // 상세 페이지 조회 API

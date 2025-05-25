@@ -9,6 +9,9 @@ const authRoutes = require('./routes/authRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const Wishlist = require('./models/wishlist'); // ✅ 이 줄 추가!
 const Order = require('./models/Order');
+const userRoutes = require('./routes/user'); // 경로 맞게 수정
+const faqRoutes = require('./routes/faq');
+
 
 const app = express();
 const PORT = 3000;
@@ -89,6 +92,10 @@ app.use('/', express.static(path.join(__dirname, 'Html'))); // 정적으로 처�
 app.use(express.static('public'));
 //랜럼 이미지 때문에
 app.use('/api/product', productRoutes);
+// 유저 정보 & 수정
+app.use('/api/users', userRoutes);
+// faq
+app.use('/api/faqs', faqRoutes);
 
 // 관리자 페이지 라우팅
 app.get('/admin', (req, res) => {

@@ -68,6 +68,7 @@
     <ul class="listbar">
     </ul>
   </div>
+  
   <div class="container">
     <header>MY Page</header>
     <div class="main-section">
@@ -83,10 +84,13 @@
 
       <section class="content">
         <div class="user-info">
-          <p><strong>안녕하세요, ○○○님</strong></p>
-          <p>이메일: abc@abc.com</p>
-          <button class="edit-btn">회원정보 수정</button>
+          <p><strong>안녕하세요, <span id="username">○○○</span>님</strong></p>
+          <p>이메일: <input type="email" id="email" disabled /></p>
+          <p>이름: <input type="text" id="name" disabled /></p>
+          <button class="edit-btn" id="editBtn">회원정보 수정</button>
+          <button id="saveBtn" style="display: none;">저장</button>
         </div>
+
 
         <div class="section">
           <div class="section-title">최근 주문 내역</div>
@@ -109,6 +113,53 @@
       alert("로그인이 필요합니다.");
       return;
     }
+
+    // 추가: 회원 정보 가져오기
+try {
+  const res = await fetch(`/api/users/${userId}`);
+  if (!res.ok) throw new Error("회원 정보 조회 실패");
+  const user = await res.json();
+
+  document.getElementById('username').textContent = user.name;
+  document.getElementById('email').value = user.email;
+  document.getElementById('name').value = user.name;
+} catch (err) {
+  console.error("회원 정보 불러오기 실패:", err);
+}
+
+// 수정 버튼 동작
+document.getElementById("editBtn").addEventListener("click", () => {
+  document.getElementById("email").disabled = false;
+  document.getElementById("name").disabled = false;
+  document.getElementById("editBtn").style.display = "none";
+  document.getElementById("saveBtn").style.display = "inline-block";
+});
+
+// 저장 버튼 동작
+document.getElementById("saveBtn").addEventListener("click", async () => {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+
+  try {
+    const res = await fetch(`/api/users/${userId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email })
+    });
+    const data = await res.json();
+    alert(data.message);
+
+    // UI 반영
+    document.getElementById("username").textContent = name;
+    document.getElementById("email").disabled = true;
+    document.getElementById("name").disabled = true;
+    document.getElementById("editBtn").style.display = "inline-block";
+    document.getElementById("saveBtn").style.display = "none";
+  } catch (err) {
+    console.error("회원 정보 수정 실패:", err);
+  }
+});
+
 
     // ✅ 찜한 상품 불러오기
     try {
