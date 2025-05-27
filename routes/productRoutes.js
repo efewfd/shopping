@@ -144,27 +144,27 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-
-
-
-
-// 상품 수정
+// 상품 수정 (MySQL + MongoDB 모두 수정)
 router.put('/:id', async (req, res) => {
   const { name, price, stock } = req.body;
+  const id = req.params.id;
+
+  console.log("🔧 수정 요청:", { id, name, price, stock });
 
   try {
-    // ✅ MySQL 재고 업데이트
+    // MySQL 수정
     await db.execute(`
-      UPDATE products SET name = ?, price = ?, stock = ?
-      WHERE id = ?
-    `, [name, price, stock, req.params.id]);
+      UPDATE products SET name = ?, price = ?, stock = ? WHERE id = ?
+    `, [name, price, stock, id]);
 
-    // ✅ MongoDB 재고도 함께 업데이트
-    await ProductModel.findByIdAndUpdate(req.params.id, {
+    // MongoDB 수정 (UUID 대응)
+    const mongoResult = await Product.findOneAndUpdate({ _id: id }, {
       name,
       price,
       stock
     });
+
+    console.log("✅ MongoDB 수정 결과:", mongoResult);
 
     res.json({ message: '상품 수정 완료 (MySQL + MongoDB)' });
   } catch (err) {
@@ -172,6 +172,9 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ message: '상품 수정 실패', error: err.message });
   }
 });
+
+
+
 
 
 module.exports = router;
