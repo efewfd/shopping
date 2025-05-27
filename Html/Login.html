@@ -100,9 +100,8 @@
         const data = await res.json();
         if (res.ok) {
             console.log('[로그인 성공]', data);
-            localStorage.setItem('userId', data.userId);  // 로그인한 사용자 ID 저장
-            localStorage.setItem('userName', data.name);
-            // 예: localStorage.setItem('userId', data.userId);
+            localStorage.setItem('userId', data.user.userId);  // 로그인한 사용자 ID 저장
+            localStorage.setItem('userName', data.user.name);
             alert('로그인 성공!');
             window.location.href = 'home.html';
         } else {

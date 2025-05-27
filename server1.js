@@ -29,8 +29,8 @@ app.use((req, res, next) => {
 
 
 
-const wishlistRouter = require('./routes/wishlist');
-app.use('/api/wishlist', wishlistRouter);
+const wishlistRoutes = require('./routes/wishlist');
+app.use('/api/wishlist', wishlistRoutes);
 
 // MongoDB 연결
 mongoose.connect('mongodb+srv://wsx03sd:jayoung038@cluster0.xh5fwpe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {

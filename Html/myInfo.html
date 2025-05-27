@@ -118,6 +118,7 @@
     }
 
     const userId = sessionData.user.userId;
+    console.log("userId 확인:", userId);
 
     // ✅ 회원 정보 가져오기
     try {
@@ -178,11 +179,13 @@
       }
 
       container.innerHTML = wishlist.map(item => `
-        <div class="wishlist-item">
-          <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; vertical-align: middle;"/>
+        <div class="wishlist-item" data-product-id="${item.productId}">
+          <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
           <strong>${item.product.title}</strong> (${item.product.price.toLocaleString()}원)
+          <button class="remove-wishlist-btn" style="margin-left: 10px;">♥</button>
         </div>
       `).join('');
+
     } catch (error) {
       console.error("찜 목록 불러오기 실패:", error);
     }

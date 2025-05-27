@@ -131,23 +131,18 @@ function addToWishlist(product) {
 
 //찜
 async function toggleWishlist(product, buttonElement) {
-  const userId = localStorage.getItem('userId');
-  console.log('🧪 userId:', userId);
-  console.log('🧪 product.code:', product.code);
 
+  const userId = localStorage.getItem('userId');
   if (!userId) {
     alert('로그인이 필요합니다.');
     return;
   }
 
+  const isWished = buttonElement.classList.contains("active");
+
   try {
-    const checkRes = await fetch(`/api/wishlist/${userId}`);
-    if (!checkRes.ok) throw new Error('404 or Server Error');
-
-    const wishlist = await checkRes.json();
-    const exists = wishlist.find(item => item.productId === product.code);
-
-    if (exists) {
+    if (isWished) {
+      // ❌ 이미 찜된 상태 → 삭제 요청
       const deleteRes = await fetch('/api/wishlist', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
@@ -159,6 +154,7 @@ async function toggleWishlist(product, buttonElement) {
       buttonElement.textContent = "찜하기";
       buttonElement.classList.remove("active");
     } else {
+      // ✅ 아직 안 찜된 상태 → 등록 요청
       const postRes = await fetch('/api/wishlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -176,9 +172,8 @@ async function toggleWishlist(product, buttonElement) {
 
       if (!postRes.ok) throw new Error('찜 등록 실패');
 
-      const result = await postRes.json(); // ✅ 이제 안전하게 json 파싱 가능
+      const result = await postRes.json(); // ✅ 이 줄 추가
       console.log("✅ 찜 등록 응답:", result);
-
       buttonElement.textContent = "찜 취소";
       buttonElement.classList.add("active");
     }
@@ -186,7 +181,8 @@ async function toggleWishlist(product, buttonElement) {
     console.error('찜 처리 실패:', error);
     alert('오류가 발생했습니다.');
   }
-} 
+}
+
 
 window.addToCart = addToCart;
 window.addToCartAndGo = addToCartAndGo;
