@@ -21,7 +21,7 @@ if (hasItems) {
 
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td><input type="checkbox" class="item-checkbox" /></td>
+      <td><input type="checkbox" class="item-checkbox" data-id="${item.id}" /></td>
       <td><img src="${item.image}" alt="${item.title}" class="item-img" /></td>
       <td>${item.title}</td>
       <td>${price.toLocaleString()}원</td>
@@ -140,27 +140,28 @@ async function submitCheckedOrders() {
     return;
   }
 
-  const selectedItems = [];
+const selectedItems = [];
 
-  for (const checkbox of checkboxes) {
-    const row = checkbox.closest("tr");
-    const title = row.children[2].textContent.trim();
-    const product = cart.find(item => item.title === title);
-    if (!product) {
-      console.warn("❗ 상품 못 찾음:", title);
-      continue;
-    }
-    selectedItems.push(product);
+for (const checkbox of checkboxes) {
+  const productId = checkbox.dataset.id;
+  if (!productId) continue; // 혹시라도 undefined이면 무시
+
+  const product = cart.find(item => item.id === productId);
+  if (!product) {
+    console.warn("❗ 상품 못 찾음:", productId);
+    continue;
   }
+  selectedItems.push(product);
+}
 
-  if (selectedItems.length === 0) {
-    alert("선택한 상품 정보를 찾을 수 없습니다.");
-    return;
-  }
+// ✅ 선택된 상품이 하나도 없으면 중단 (경고 + 이동 X)
+if (!selectedItems.length) {
+  alert("주문할 상품을 선택해주세요.");
+  return; // ❗ 반드시 return으로 종료시켜야 함!
+}
 
-  // ✅ 결제용 상품을 localStorage에 저장
-  localStorage.setItem("pendingOrders", JSON.stringify(selectedItems));
+// ✅ 정상 처리
+localStorage.setItem("pendingOrders", JSON.stringify(selectedItems));
+location.href = "checkout.html";
 
-  // ✅ 결제 페이지로 이동
-  location.href = "checkout.html";
 }

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../js/db'); // ✅ DB 연결
+const ProductModel = require('../models/product'); // mongoose 모델
+
 // [GET] 전체 주문 목록 (관리자용)
 router.get('/', async (req, res) => {
   try {
@@ -60,22 +62,21 @@ router.get('/:userId', async (req, res) => {
 // 주문 저장 API
 router.post('/', async (req, res) => {
   const { userId, productId, quantity, status, product } = req.body;
-
-const productTitle = (product?.title || "").trim() || "제목없음";
+  console.log("📦 요청 바디 전체:", req.body);
+  console.log("📦 userId:", userId);
+  console.log("📦 productId:", productId);
+  console.log("📦 quantity:", quantity);
+  console.log("📦 product.title:", product?.title);
+  console.log("📦 productTitle 최종:", (product?.title || "").trim());
+  const productTitle = (product?.title || "").trim() || "제목없음";
   const productImage = product?.image || null;
-
-    console.log("🔥 서버에서 받은 quantity:", quantity);
-  console.log("🔥 서버에서 받은 productId:", productId);
-
-console.log("📦 요청 바디 전체:", req.body);
-console.log("📦 productTitle 최종:", productTitle);
 
   if (!userId || !productId || !productTitle) {
     return res.status(400).json({ message: '필수 항목 누락' });
   }
 
   try {
-    // 1. 주문 저장
+    // 1. MySQL에 주문 등록
     await db.execute(`
       INSERT INTO orders (
         user_id, product_id, quantity, status, product_title, product_image
@@ -84,26 +85,36 @@ console.log("📦 productTitle 최종:", productTitle);
       userId, productId, quantity || 1, status || '결제완료', productTitle, productImage
     ]);
 
-    // 2. 재고 감소
+    // 2. MySQL 재고 감소
     const [result] = await db.execute(`
       UPDATE products
       SET stock = stock - ?
       WHERE id = ? AND stock >= ?
     `, [quantity, productId, quantity]);
 
-    console.log("🧪 재고 차감 affectedRows:", result.affectedRows);
-
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: '재고 부족으로 주문이 실패했습니다.' });
     }
 
-    console.log("✅ 주문 등록 및 재고 차감 완료:", productTitle);
+    // ✅ 3. MongoDB 재고도 함께 감소
+try {
+  console.log("🔎 MongoDB 재고 차감 대상 productId:", productId);
+  await ProductModel.findByIdAndUpdate(productId, {
+    $inc: { stock: -quantity }
+  });
+  console.log("📦 MongoDB 재고도 함께 차감 완료");
+} catch (mongoErr) {
+  console.error("❌ MongoDB 재고 차감 실패:", mongoErr.message);
+}
+
     res.status(201).json({ message: '주문 등록 성공' });
   } catch (err) {
     console.error('🛑 주문 등록 실패:', err);
-    res.status(500).json({ message: '서버 오류' });
+    console.error("🛑 전체 에러 객체:", err);
+    res.status(500).json({ message: '서버 오류', error: err.message });
   }
 });
+
 
 
 

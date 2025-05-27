@@ -72,40 +72,32 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     try {
       for (const item of cart) {
-        if (!item.code || !item.quantity) throw new Error("상품 정보 누락");
-console.log("🔥 전송 전:", {
-  userId,
-  productId: item.code,
-  quantity: item.quantity,
-  productTitle: item.title,
-  productImage: item.image
-});
-      console.log("📦 전송할 product.title:", item.title);
-        console.log("주문 전송 중:", {
-          userId,
-          productId: item.code,
-          quantity: item.quantity,
-          title: item.title
-        });
+  if (!item.code || !item.quantity) throw new Error("상품 정보 누락");
 
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            userId,
-            productId: item.code,
-            quantity: item.quantity,
-            status: "결제완료",
-            product: {
-              title: item.title || item.name || "이름없음",
-              image: item.image || ""
-            }
-          })
-        });
-
-        if (!res.ok) throw new Error("주문 실패");
+  const res = await fetch("/api/orders", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      userId,
+      productId: item.code,
+      quantity: item.quantity,
+      status: "결제완료",
+      product: {
+        title: item.title || item.name || "이름없음",
+        image: item.image || ""
       }
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(`❌ ${item.title} 주문 실패: ${data.message || '알 수 없는 오류'}`);
+    throw new Error(`${item.title} 주문 실패`);
+  }
+}
+
 
       setTimeout(() => {
         alert("결제가 완료되었습니다!");
