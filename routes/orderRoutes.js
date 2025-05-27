@@ -34,17 +34,17 @@ router.get('/:userId', async (req, res) => {
 
   try {
     const [orders] = await db.execute(`
-      SELECT id, quantity, status, created_at, product_title, product_image
+      SELECT id, product_id, quantity, status, created_at, product_title, product_image
       FROM orders
       WHERE user_id = ?
       ORDER BY created_at DESC
     `, [userId]);
 
-    // 프론트 JS에서 기대하는 구조로 변환
     const result = orders.map(order => ({
       quantity: order.quantity,
       status: order.status,
       createdAt: order.created_at,
+      productId: order.product_id, // ✅ 여기에 포함!
       product: {
         title: order.product_title,
         image: order.product_image
@@ -57,6 +57,7 @@ router.get('/:userId', async (req, res) => {
     res.status(500).json({ message: '서버 오류' });
   }
 });
+
 
 
 // 주문 저장 API

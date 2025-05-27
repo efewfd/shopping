@@ -14,6 +14,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// 랜덤 상품 3개 가져오기
+router.get('/random-products', async (req, res) => {
+  try {
+    const count = parseInt(req.query.count) || 5;
+    const randomProducts = await Product.aggregate([{ $sample: { size: count } }]);
+    res.json(randomProducts);
+  } catch (err) {
+    console.error('❌ 랜덤 상품 조회 실패:', err);
+    res.status(500).json({ message: '랜덤 상품 조회 실패' });
+  }
+});
+
 // 상품 목록
 router.get('/', async (req, res) => {
   try {
@@ -32,6 +44,27 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: '상품 목록 조회 실패', error: err.message });
   }
 });
+
+
+// 상세 페이지 조회 API
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // ✅ 문자열 기반 _id 조회
+    const product = await Product.findOne({ _id: id });
+
+    if (!product) {
+      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    }
+
+    res.json(product);
+  } catch (err) {
+    console.error('❌ 상품 조회 실패:', err.message);
+    res.status(500).json({ message: '서버 오류', error: err.message });
+  }
+});
+
 
 
 // 상품 등록
@@ -118,49 +151,27 @@ router.delete('/:id', async (req, res) => {
 // 상품 수정
 router.put('/:id', async (req, res) => {
   const { name, price, stock } = req.body;
+
   try {
-    await Product.findByIdAndUpdate(req.params.id, { name, price, stock });
-    res.json({ message: '상품 수정 완료' });
+    // ✅ MySQL 재고 업데이트
+    await db.execute(`
+      UPDATE products SET name = ?, price = ?, stock = ?
+      WHERE id = ?
+    `, [name, price, stock, req.params.id]);
+
+    // ✅ MongoDB 재고도 함께 업데이트
+    await ProductModel.findByIdAndUpdate(req.params.id, {
+      name,
+      price,
+      stock
+    });
+
+    res.json({ message: '상품 수정 완료 (MySQL + MongoDB)' });
   } catch (err) {
-    res.status(500).json({ message: '수정 실패', error: err.message });
+    console.error('❌ 상품 수정 실패:', err.message);
+    res.status(500).json({ message: '상품 수정 실패', error: err.message });
   }
 });
-
-// 랜덤 상품 3개 가져오기
-router.get('/random-products', async (req, res) => {
-  try {
-    const count = parseInt(req.query.count) || 5;
-    const randomProducts = await Product.aggregate([{ $sample: { size: count } }]);
-    res.json(randomProducts);
-  } catch (err) {
-    console.error('❌ 랜덤 상품 조회 실패:', err);
-    res.status(500).json({ message: '랜덤 상품 조회 실패' });
-  }
-});
-
-
-
-// 상세 페이지 조회 API
-router.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // ✅ 문자열 기반 _id 조회
-    const product = await Product.findOne({ _id: id });
-
-    if (!product) {
-      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
-    }
-
-    res.json(product);
-  } catch (err) {
-    console.error('❌ 상품 조회 실패:', err.message);
-    res.status(500).json({ message: '서버 오류', error: err.message });
-  }
-});
-
-
-
 
 
 module.exports = router;

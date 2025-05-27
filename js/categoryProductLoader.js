@@ -17,19 +17,32 @@ async function loadCategoryProducts() {
     const res = await fetch(url);
     const products = await res.json();
 
-    const validatedProducts = [];
+const validatedProducts = [];
 
-    for (const item of products) {
-      try {
-        const check = await fetch(`/api/products/${item._id}`);
-        if (check.ok) {
-          const validProduct = await check.json();
-          if (validProduct) validatedProducts.push(validProduct);
-        }
-      } catch (err) {
-        console.warn("❌ 삭제된 상품 걸러냄:", item._id);
-      }
+for (const item of products) {
+  // ✅ 상품 ID 유효성 체크 (빈 문자열, undefined 등 제거)
+  if (!item || !item._id || typeof item._id !== 'string') {
+    console.warn("❌ 유효하지 않은 상품 ID:", item);
+    continue;
+  }
+
+  // ✅ 상품이 백엔드에 존재하는지 확인
+  try {
+    const res = await fetch(`/api/products/${item._id}`);
+    if (!res.ok) {
+      console.warn(`❌ 삭제된 상품 ID: ${item._id}`);
+      continue;
     }
+
+    const product = await res.json();
+    if (product && product.name) {
+      validatedProducts.push(product);
+    }
+  } catch (err) {
+    console.warn("❌ 상품 확인 실패:", item._id);
+  }
+}
+
 
     const container = document.getElementById('product-list');
     container.innerHTML = '';

@@ -171,22 +171,38 @@
     try {
       const res = await fetch(`/api/wishlist/${userId}`, { credentials: "include" });
       const rawWishlist = await res.json();
+
+
+
+//유효성 검사
 const validatedWishlist = [];
 
-// ✅ 상품 유효성 체크
 for (const item of rawWishlist) {
+  if (!item || !item.productId || typeof item.productId !== 'string') {
+    console.warn("❌ 잘못된 찜 항목:", item);
+    continue;
+  }
+
   try {
     const res = await fetch(`/api/products/${item.productId}`);
-    if (res.ok) {
-      const product = await res.json();
-      if (product && product.image_url) {
-        validatedWishlist.push(item);
-      }
+    if (!res.ok) {
+      console.warn("❌ 삭제된 찜 상품:", item.productId);
+      continue;
     }
+
+    const product = await res.json();
+
+    validatedWishlist.push({
+      ...item,
+      product
+    });
   } catch (err) {
-    console.warn("❌ 유효하지 않은 찜 상품:", item.productId);
+    console.warn("❌ 유효하지 않은 찜 상품 요청 실패:", item.productId);
   }
 }
+
+
+
 
 
 const container = document.getElementById("wishlist-container");
@@ -198,8 +214,8 @@ if (!validatedWishlist.length) {
 
 container.innerHTML = validatedWishlist.map(item => `
   <div class="wishlist-item" data-product-id="${item.productId}">
-    <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
-    <strong>${item.product.title}</strong> (${item.product.price.toLocaleString()}원)
+    <img src="${item.product.image_url}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
+    <strong>${item.product.name}</strong> (${item.product.price.toLocaleString()}원)
     <button class="remove-wishlist-btn" style="margin-left: 10px;">♥</button>
   </div>
 `).join('');
@@ -222,34 +238,62 @@ document.querySelectorAll(".wishlist-item").forEach(item => {
     }
 
     // ✅ 주문 내역 불러오기
-    try {
-const orderRes = await fetch(`/api/orders/${userId}`, { credentials: "include" });
-const orders = await orderRes.json();
+try {
+  const orderRes = await fetch(`/api/orders/${userId}`, { credentials: "include" });
+  const orders = await orderRes.json();
+
+const validatedOrders = [];
+console.log("✅ 서버에서 받아온 주문 목록:", orders);
+
+for (const order of orders) {
+  if (!order.productId || typeof order.productId !== 'string') continue;
+
+  try {
+    const res = await fetch(`/api/products/${order.productId}`);
+    if (!res.ok) continue;
+
+    const product = await res.json();
+
+    validatedOrders.push({
+      ...order,
+      product
+    });
+  } catch (err) {
+    console.warn("❌ 유효하지 않은 주문 상품:", order.productId);
+  }
+}
 
 
-      const orderContainer = document.getElementById("order-container");
-      if (!orders.length) {
-        orderContainer.innerHTML = "<p>주문 내역이 없습니다.</p>";
-        return;
-      }
+  const orderContainer = document.getElementById("order-container");
 
-      orderContainer.innerHTML = orders.map(order => {
-        const created = new Date(order.createdAt).toLocaleDateString();
-        return `
-          <div class="order-item">
-            <img src="${order.product?.image || '/default.png'}" alt="상품 이미지" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px; vertical-align: middle;"/>
-            <div>
-              <p><strong>${order.product?.title || '상품명 없음'}</strong></p>
-              <p>주문일: ${created}</p>
-              <p>수량: ${order.quantity}</p>
-              <p>상태: ${order.status}</p>
-            </div>
-          </div>
-        `;
-      }).join('');
-    } catch (err) {
-      console.error("주문 내역 불러오기 실패:", err);
-    }
+  if (!validatedOrders.length) {
+    orderContainer.innerHTML = "<p>주문 내역이 없습니다.</p>";
+    return;
+  }
+
+orderContainer.innerHTML = orders.map(order => {
+  const created = new Date(order.createdAt).toLocaleDateString();
+  return `
+    <div class="order-item">
+      <img src="${order.product?.image || '/images/default.png'}"
+           alt="상품 이미지"
+           style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
+      <div>
+        <p><strong>${order.product?.title || '상품명 없음'}</strong></p>
+        <p>주문일: ${created}</p>
+        <p>수량: ${order.quantity}</p>
+        <p>상태: ${order.status}</p>
+      </div>
+    </div>
+  `;
+}).join('');
+
+
+} catch (err) {
+  console.error("❌ 주문 내역 불러오기 실패:", err);
+}
+
+
   });
 </script>
 

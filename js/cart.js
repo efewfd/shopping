@@ -111,9 +111,77 @@ async function clearCart() {
     window.location.reload();
   }
 }
+function renderCartItems() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const hasItems = cart.length > 0;
 
-// ✅ 전체 선택 체크박스 기능
-window.addEventListener("DOMContentLoaded", () => {
+  document.querySelector(".cart-table.empty").style.display = hasItems ? "none" : "";
+  document.querySelector(".cart-table.full").style.display = hasItems ? "" : "none";
+  document.querySelector(".cart-summary").style.display = hasItems ? "" : "none";
+  document.querySelector(".cart-buttons").style.display = hasItems ? "" : "none";
+
+  const tbody = document.querySelector(".cart-table.full tbody");
+  tbody.innerHTML = "";
+
+  let totalPrice = 0;
+
+  cart.forEach(item => {
+    const quantity = item.quantity || 1;
+    const price = parseInt(item.price);
+    const itemTotal = price * quantity;
+    totalPrice += itemTotal;
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><input type="checkbox" class="item-checkbox" data-id="${item.id}" /></td>
+      <td><img src="${item.image}" alt="${item.title}" class="item-img" /></td>
+      <td>${item.title}</td>
+      <td>${price.toLocaleString()}원</td>
+      <td>
+        <button onclick="changeQuantity('${item.id}', -1)">-</button>
+        <span id="qty-${item.id}">${item.quantity || 1}</span>
+        <button onclick="changeQuantity('${item.id}', 1)">+</button>
+        <button onclick="updateQuantity('${item.id}')">수정</button>
+      </td>
+      <td>무료배송</td>
+      <td>0원</td>
+      <td>${itemTotal.toLocaleString()}원</td>
+      <td><button onclick="removeItem('${item.id}')">삭제하기</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.querySelector(".cart-summary").innerHTML =
+    `총 구매금액: ${totalPrice.toLocaleString()}원 + 배송료: 0원 = <strong>${totalPrice.toLocaleString()}원</strong>`;
+}
+
+
+async function validateCart() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const validatedCart = [];
+
+  for (const item of cart) {
+    try {
+      const res = await fetch(`/api/products/${item.id}`);
+      if (res.ok) {
+        const product = await res.json();
+        if (product) validatedCart.push(item);
+      }
+    } catch (err) {
+      console.warn("❌ 삭제된 상품:", item.id);
+    }
+  }
+
+  localStorage.setItem("cart", JSON.stringify(validatedCart));
+}
+
+
+// ✅ 전체 선택 체크박스 기능 + validateCart() 호출
+window.addEventListener("DOMContentLoaded", async () => {
+  await validateCart();
+  renderCartItems();
+  attachOrderButton(); 
+
   const selectAll = document.getElementById("select-all");
   if (selectAll) {
     selectAll.addEventListener("change", () => {
@@ -124,9 +192,20 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+function attachOrderButton() {
+  const orderBtn = document.getElementById("order-button");
+  if (orderBtn) {
+    orderBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      submitAllOrders(); // ✅ 여기에 잘 연결돼 있어야 함
+    });
+  }
+}
+
+
 
 // ✅ 체크된 상품만 주문 기능 (전체 + 선택 공통)
-async function submitCheckedOrders() {
+async function submitAllOrders() {
   const userId = localStorage.getItem("userId");
   if (!userId) {
     alert("로그인이 필요합니다.");
