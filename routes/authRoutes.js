@@ -84,6 +84,10 @@ router.post('/login', async (req, res) => {
   if (!users.length) return res.status(400).json({ message: '존재하지 않는 ID입니다.' });
 
   const user = users[0];
+
+  if (!user.is_active) {
+      return res.status(403).json({ message: '잠금 처리된 계정입니다.' });
+    }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(400).json({ message: '비밀번호가 틀렸습니다.' });
 
@@ -99,6 +103,14 @@ router.post('/login', async (req, res) => {
     user: req.session.user
   });
 });
+
+router.post('/activate', async (req, res) => {
+  const { userId } = req.body;
+  await db.query('UPDATE users SET is_active = true WHERE user_id = ?', [userId]);
+  res.json({ message: '계정 잠금 해제 완료' });
+});
+
+
 
 
 

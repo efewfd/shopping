@@ -76,6 +76,12 @@ router.post('/', async (req, res) => {
   }
 
   try {
+    // MongoDB에서 재고 먼저 확인
+const mongoProduct = await ProductModel.findById(productId);
+if (!mongoProduct || mongoProduct.stock < quantity) {
+  return res.status(400).json({ message: '재고가 부족합니다.' });
+}
+
     // 1. MySQL에 주문 등록
     await db.execute(`
       INSERT INTO orders (

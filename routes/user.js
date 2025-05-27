@@ -1,6 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../js/db');
+// [GET] 관리자용 전체 회원 조회 (MySQL)
+router.get('/all', async (req, res) => {
+  try {
+    const [users] = await db.query('SELECT id, user_id, name, email, created_at, is_active FROM users ORDER BY created_at DESC');
+    res.json(users);
+  } catch (err) {
+    console.error('회원 전체 조회 실패:', err);
+    res.status(500).json({ error: '서버 오류' });
+  }
+});
+
+// 회원 삭제
+router.post('/delete', async (req, res) => {
+  const { userId } = req.body;
+  await User.deleteOne({ userId });
+
+  console.log('[삭제 요청]', userId, result); // 로그 찍기
+
+  res.json({ message: '회원 삭제 완료' });
+});
 
 // [GET] 회원 정보 조회
 router.get('/:id', async (req, res) => {
@@ -23,7 +43,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const userId = req.params.id;
   const { name, email } = req.body;
-  const sql = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
+  const sql = 'UPDATE users SET name = ?, email = ? WHERE user_id = ?';
   try {
     const [result] = await db.query(sql, [name, email, userId]);
     res.json({ message: '회원 정보가 성공적으로 수정되었습니다.' });
@@ -32,5 +52,13 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: '서버 오류' });
   }
 });
+
+// POST /api/users/deactivate
+router.post('/deactivate', async (req, res) => {
+  const { userId } = req.body;
+  await db.query('UPDATE users SET is_active = false WHERE user_id = ?', [userId]);
+  res.json({ message: '계정 잠금 완료' });
+});
+
 
 module.exports = router;
