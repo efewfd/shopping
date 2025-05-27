@@ -73,7 +73,8 @@ window.addEventListener("DOMContentLoaded", async () => {
     try {
       for (const item of cart) {
         if (!item.code || !item.quantity) throw new Error("상품 정보 누락");
-
+console.log("📦 주문 전송 전 item:", item);
+      console.log("📦 전송할 product.title:", item.title);
         console.log("주문 전송 중:", {
           userId,
           productId: item.code,
@@ -91,7 +92,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             quantity: item.quantity,
             status: "결제완료",
             product: {
-              title: item.title || "이름없음",
+              title: item.title || item.name,
               image: item.image || ""
             }
           })

@@ -1,28 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../js/db'); // ✅ DB 연결
-
-// 주문 저장 API
-router.post('/', async (req, res) => {
-  try {
-    const { userId, productId, quantity, status } = req.body;
-    if (!userId || !productId || !quantity) {
-      return res.status(400).json({ message: '필수 항목 누락' });
-    }
-
-    await db.execute(
-      'INSERT INTO orders (user_id, product_id, quantity, status) VALUES (?, ?, ?, ?)',
-      [userId, productId, quantity, status || '배송준비중']
-    );
-
-    res.json({ message: '주문이 완료되었습니다.' });
-  } catch (err) {
-    console.error('[주문 오류]', err.message);
-    res.status(500).json({ message: '서버 오류', error: err.message });
-  }
-});
-
-// 주문 조회
+// [GET] 전체 주문 목록 (관리자용)
 router.get('/', async (req, res) => {
   try {
     const [orders] = await db.execute(`
@@ -31,21 +10,93 @@ router.get('/', async (req, res) => {
         o.user_id,
         u.name AS user_name,
         o.product_id,
-        p.name AS product_name,  -- ✅ 이 라인이 상품명을 불러오는 핵심
+        o.product_title,
         o.quantity,
         o.status,
         o.created_at
       FROM orders o
       LEFT JOIN users u ON o.user_id = u.user_id
-      LEFT JOIN products p ON o.product_id = p.id
       ORDER BY o.created_at DESC
     `);
+
     res.json(orders);
   } catch (err) {
-    console.error("전체 주문 조회 실패:", err.message);
-    res.status(500).json({ message: "서버 오류" });
+    console.error('🛑 전체 주문 목록 조회 실패:', err);
+    res.status(500).json({ message: '서버 오류' });
   }
 });
+
+// 주문 조회
+router.get('/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const [orders] = await db.execute(`
+      SELECT id, quantity, status, created_at, product_title, product_image
+      FROM orders
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+    `, [userId]);
+
+    // 프론트 JS에서 기대하는 구조로 변환
+    const result = orders.map(order => ({
+      quantity: order.quantity,
+      status: order.status,
+      createdAt: order.created_at,
+      product: {
+        title: order.product_title,
+        image: order.product_image
+      }
+    }));
+
+    res.json(result);
+  } catch (err) {
+    console.error('🛑 주문 내역 불러오기 실패:', err);
+    res.status(500).json({ message: '서버 오류' });
+  }
+});
+
+
+// 주문 저장 API
+router.post('/', async (req, res) => {
+  const { userId, productId, quantity, status, product } = req.body;
+
+  // ❗ 누락 방지: title과 image 미리 추출
+  const productTitle = product?.title || "제목없음";
+  const productImage = product?.image || null;
+
+  if (!userId || !productId || !productTitle) {
+    return res.status(400).json({ message: '필수 항목 누락' });
+  }
+
+  try {
+    await db.execute(`
+      INSERT INTO orders (
+        user_id,
+        product_id,
+        quantity,
+        status,
+        product_title,
+        product_image
+      ) VALUES (?, ?, ?, ?, ?, ?)
+    `, [
+      userId,
+      productId,
+      quantity || 1,
+      status || '결제완료',
+      productTitle,
+      productImage
+    ]);
+
+    console.log("✅ 주문 등록 완료:", productTitle);
+    res.status(201).json({ message: '주문 등록 성공' });
+  } catch (err) {
+    console.error('🛑 주문 등록 실패:', err);
+    res.status(500).json({ message: '서버 오류' });
+  }
+});
+
+
 
 // PATCH /api/orders/:id
 router.patch('/:id', async (req, res) => {

@@ -152,27 +152,28 @@
   </div>
   <script>
   async function submitAllOrders() {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    if (cart.length === 0) {
-      alert("장바구니가 비어 있습니다.");
-      return;
-    }
-
-    localStorage.setItem("pendingOrders", JSON.stringify(cart));
-    location.href = "checkout.html";
-    
+  const userId = localStorage.getItem("userId");
+  if (!userId) {
+    alert("로그인이 필요합니다.");
+    return;
   }
-  document.getElementById("order-button")?.addEventListener("click", (e) => {
+
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  if (cart.length === 0) {
+    alert("장바구니가 비어 있습니다.");
+    return;
+  }
+
+  localStorage.setItem("pendingOrders", JSON.stringify(cart));
+  location.href = "checkout.html";
+}
+
+// ✅ 클릭 이벤트 연결
+document.getElementById("order-button")?.addEventListener("click", (e) => {
   e.preventDefault();
-  submitCheckedOrders();
+  submitAllOrders(); // ✅ 이름 맞춤
 });
+
 
 // 주문 버튼에 클릭 이벤트 연결
 window.addEventListener('DOMContentLoaded', () => {

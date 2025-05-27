@@ -19,12 +19,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.productForCart = {
       id: product._id,
       code: product._id, // 찜 토글에서 이 값 사용
-      title: product.name || product.title,
+      title: product.name || product.title || "이름없음",
       price: product.price,
       image: product.image_url,
       stock: product.stock
     };
-
+console.log("🧪 productForCart 저장됨:", window.productForCart);
     // 이 시점 이후에 버튼 이벤트 연결
   const wishBtn = document.querySelector('.wishlist');
   if (!window.productForCart) {

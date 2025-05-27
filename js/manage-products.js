@@ -52,26 +52,28 @@ document.querySelector("#product-form").addEventListener("submit", async (e) => 
 async function loadProducts() {
   const res = await fetch("/api/products");
   const products = await res.json();
-
   const tbody = document.querySelector("#product-table tbody");
   tbody.innerHTML = "";
 
-  products.forEach(product => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td><img src="${product.image_url}" width="60" /></td>
-      <td><input type="text" value="${product.name}" id="name-${product.id}" /></td>
-      <td><input type="number" value="${product.price}" id="price-${product.id}" /></td>
-      <td><input type="number" value="${product.stock}" id="stock-${product.id}" /></td>
-      <td>${product.category1}</td>
-      <td>${product.category2}</td>
-      <td>
-        <button onclick="updateProduct(${product.id})">수정</button>
-        <button onclick="deleteProduct(${product.id})">삭제</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
+products.forEach(product => {
+  const pid = product.id || product._id;
+
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td><img src="${product.image_url}" width="60" /></td>
+    <td><input type="text" value="${product.name}" id="name-${pid}" /></td>
+    <td><input type="number" value="${product.price}" id="price-${pid}" /></td>
+    <td><input type="number" value="${product.stock}" id="stock-${pid}" /></td>
+    <td>${product.category1}</td>
+    <td>${product.category2}</td>
+    <td>
+      <button onclick="updateProduct('${pid}')">수정</button>
+      <button onclick="deleteProduct('${pid}')">삭제</button>
+    </td>
+  `;
+  tbody.appendChild(row);
+});
+
 }
 
 // 상품 삭제

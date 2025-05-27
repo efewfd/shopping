@@ -192,8 +192,9 @@
 
     // ✅ 주문 내역 불러오기
     try {
-      const orderRes = await fetch(`/api/orders/${userId}`, { credentials: "include" });
-      const orders = await orderRes.json();
+const orderRes = await fetch(`/api/orders/${userId}`, { credentials: "include" });
+const orders = await orderRes.json();
+
 
       const orderContainer = document.getElementById("order-container");
       if (!orders.length) {

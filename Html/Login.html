@@ -69,47 +69,62 @@
         <div class="login-page">
             <h2>Login</h2>
             <form id="login-form" class="login-form">
-                <input class="Email" name="userId" placeholder="ID" type="text" required>
-                <input class="Password" name="password" placeholder="Password" type="password" required>
-                <label for="rememder-check">
-                    <input class="checkbox" type="checkbox" id="rememder-check">아이디 기억하기
-                </label>
-                <button class="login-but" type="submit">
-                    로그인
-                </button>
+            <input class="Email" name="userId" id="userId-input" placeholder="ID" type="text" required>
+            <input class="Password" name="password" placeholder="Password" type="password" required>
+            <label for="rememder-check">
+                <input class="checkbox" type="checkbox" id="rememder-check">아이디 기억하기
+            </label>
+            <button class="login-but" type="submit">로그인</button>
             </form>
+
 
             <p class="SingUp-page"><a href="SignUp.html">Sign Up</a></p>
         </div>
         <script>
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const userId = e.target.userId.value;
-        const password = e.target.password.value;
-
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json' 
-            },
-            credentials: 'include',
-            body: JSON.stringify({ userId, password })  // JSON으로 보내기
+        // ✅ [1] 페이지 로딩 시 기억된 아이디 자동 입력
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedId = localStorage.getItem('rememberedId');
+            if (savedId) {
+            document.getElementById('userId-input').value = savedId;
+            document.getElementById('rememder-check').checked = true;
+            }
         });
 
-        const data = await res.json();
-        if (res.ok) {
-            console.log('[로그인 성공]', data);
-            localStorage.setItem('userId', data.user.userId);  // 로그인한 사용자 ID 저장
+        // ✅ [2] 로그인 제출 처리
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userId = e.target.userId.value;
+            const password = e.target.password.value;
+
+            const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ userId, password })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+            localStorage.setItem('userId', data.user.userId);
             localStorage.setItem('userName', data.user.name);
+
+            // ✅ 아이디 기억하기 저장 여부 확인
+            const remember = document.getElementById('rememder-check').checked;
+            if (remember) {
+                localStorage.setItem('rememberedId', userId);
+            } else {
+                localStorage.removeItem('rememberedId');
+            }
+
             alert('로그인 성공!');
             window.location.href = 'home.html';
-        } else {
+            } else {
             alert('로그인 실패: ' + data.message);
-        }
+            }
         });
-
         </script>
+
         <script src="../js/navbar.js"></script>
     </body>
 </html>

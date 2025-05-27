@@ -67,22 +67,23 @@
         const orders = await res.json();
 
         const list = document.getElementById("order-list");
-        list.innerHTML = orders.map(order => `
-          <tr>
-            <td>${order.id}</td>
-            <td>${order.user_id}</td>
-            <td>${order.user_name || '-'}</td>
-            <td>${order.product_id}</td>
-            <td>${order.product_name || '-' || order.product_title}</td>
-            <td>${order.quantity}</td>
-            <td>${order.status}</td>
-            <td>${new Date(order.created_at).toLocaleString()}</td>
-            <td>
-              <button onclick="updateStatus(${order.id}, '배송중')">배송중</button>
-              <button onclick="updateStatus(${order.id}, '배송완료')">배송완료</button>
-            </td>
-          </tr>
-        `).join("");
+list.innerHTML = orders.map(order => `
+  <tr>
+    <td>${order.id}</td>
+    <td>${order.user_id}</td>
+    <td>${order.user_name || '-'}</td>
+    <td>${order.product_id}</td>
+    <td>${order.product_title || '-'}</td> <!-- ✅ 여기 수정 -->
+    <td>${order.quantity}</td>
+    <td>${order.status}</td>
+    <td>${new Date(order.created_at).toLocaleString()}</td>
+    <td>
+      <button onclick="updateStatus(${order.id}, '배송중')">배송중</button>
+      <button onclick="updateStatus(${order.id}, '배송완료')">배송완료</button>
+    </td>
+  </tr>
+`).join("");
+
 
       } catch (err) {
         alert("주문 목록을 불러오지 못했습니다.");
