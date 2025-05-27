@@ -60,43 +60,76 @@ console.log("✅ 최종 등록할 상품 ID:", form.id.value);
 
 // 상품 목록 불러오기
 async function loadProducts() {
-  const res = await fetch("/api/products");
-  const products = await res.json();
   const tbody = document.querySelector("#product-table tbody");
   tbody.innerHTML = "";
 
-products.forEach(product => {
-  const pid = product.id || product._id;
+  const res = await fetch("/api/products");
+  const products = await res.json();
+  const validatedProducts = [];
 
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td><img src="${product.image_url}" width="60" /></td>
-    <td><input type="text" value="${product.name}" id="name-${pid}" /></td>
-    <td><input type="number" value="${product.price}" id="price-${pid}" /></td>
-    <td><input type="number" value="${product.stock}" id="stock-${pid}" /></td>
-    <td>${product.category1}</td>
-    <td>${product.category2}</td>
-    <td>
-      <button onclick="updateProduct('${pid}')">수정</button>
-      <button onclick="deleteProduct('${pid}')">삭제</button>
-    </td>
-  `;
-  tbody.appendChild(row);
-});
+  for (const p of products) {
+    try {
+      const check = await fetch(`/api/products/${p._id}`);
+      if (check.ok) {
+        const realProduct = await check.json();
+        if (realProduct) validatedProducts.push(realProduct);
+      }
+    } catch (err) {
+      console.warn(`❌ 유효하지 않은 상품: ${p._id}`);
+    }
+  }
 
+  validatedProducts.forEach(product => {
+    const pid = product.id || product._id;
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td><img src="${product.image_url}" width="60" /></td>
+      <td><input type="text" value="${product.name}" id="name-${pid}" /></td>
+      <td><input type="number" value="${product.price}" id="price-${pid}" /></td>
+      <td><input type="number" value="${product.stock}" id="stock-${pid}" /></td>
+      <td>${product.category1}</td>
+      <td>${product.category2}</td>
+      <td>
+        <button onclick="updateProduct('${pid}')">수정</button>
+        <button onclick="deleteProduct('${pid}')">삭제</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
 }
+
 
 // 상품 삭제
-function deleteProduct(id) {
-  if (confirm('정말 삭제할까요?')) {
-    fetch(`/api/products/${id}`, { method: 'DELETE' })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.message);
-        loadProducts();
-      });
+async function deleteProduct(productId) {
+  console.log("🧪 삭제할 productId:", productId);
+
+  const confirmed = confirm(`${productId} 상품을 삭제하시겠습니까?`);
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`/api/products/${productId}`, {
+      method: 'DELETE'
+    });
+
+    if (!res.ok) {
+      throw new Error('서버 응답 실패');
+    }
+
+    alert('삭제 완료!');
+    location.reload();
+  } catch (err) {
+    alert('삭제 요청 실패: ' + err.message);
+    console.error('❌ 삭제 요청 실패:', err);
   }
 }
+
+
+// ✅ export해줘야 브라우저가 인식할 수 있음 (또는 window에 붙이기)
+window.deleteProduct = deleteProduct;
+
+
+
 
 // 상품 수정
 function updateProduct(id) {

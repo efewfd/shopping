@@ -97,8 +97,6 @@ app.use('/skirt', express.static(path.join(__dirname, 'Html', 'skirt'))); // 정
 app.use('/', express.static(path.join(__dirname, 'Html'))); // 정적으로 처리 -> Html 파일 안의 html
 // public 폴더 정적 경로 설정
 app.use(express.static('public'));
-//랜럼 이미지 때문에
-app.use('/api/product', productRoutes);
 // 유저 정보 & 수정
 app.use('/api/users', userRoutes);
 // faq

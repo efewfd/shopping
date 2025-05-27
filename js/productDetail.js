@@ -57,6 +57,7 @@ const res = await fetch(`/api/products/${productId}`);
   } catch (err) {
     console.error('❌ 상품 정보 불러오기 실패:', err.message);
     alert('상품 정보를 불러올 수 없습니다.');
+    window.location.href = "/home.html";
   }
 });
 

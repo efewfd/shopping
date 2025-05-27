@@ -60,7 +60,7 @@ router.post(
 
       const image_url = req.files.image ? `/uploads/${req.files.image[0].filename}` : '';
       const category2List = [category2, 'all'];
-      const productId = id || new mongoose.Types.ObjectId().toHexString();
+      const productId = crypto.randomUUID();
 
       const productData = {
         _id: productId,
@@ -96,14 +96,24 @@ router.post(
 
 // 상품 삭제
 router.delete('/:id', async (req, res) => {
-  console.log('삭제 요청 도착:', req.params.id);
   try {
-    await Product.findByIdAndDelete(req.params.id);
+    const deleted = await Product.findOneAndDelete({ _id: req.params.id });
+
+    if (!deleted) {
+      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    }
+
     res.json({ message: '상품 삭제 완료' });
   } catch (err) {
+    console.error('❌ 상품 삭제 실패:', err);
     res.status(500).json({ message: '삭제 실패', error: err.message });
   }
 });
+
+
+
+
+
 
 // 상품 수정
 router.put('/:id', async (req, res) => {

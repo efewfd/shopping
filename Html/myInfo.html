@@ -170,21 +170,40 @@
     // ✅ 찜한 상품 불러오기
     try {
       const res = await fetch(`/api/wishlist/${userId}`, { credentials: "include" });
-      const wishlist = await res.json();
+      const rawWishlist = await res.json();
+const validatedWishlist = [];
 
-      const container = document.getElementById("wishlist-container");
-      if (!wishlist.length) {
-        container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
-        return;
+// ✅ 상품 유효성 체크
+for (const item of rawWishlist) {
+  try {
+    const res = await fetch(`/api/products/${item.productId}`);
+    if (res.ok) {
+      const product = await res.json();
+      if (product && product.image_url) {
+        validatedWishlist.push(item);
       }
+    }
+  } catch (err) {
+    console.warn("❌ 유효하지 않은 찜 상품:", item.productId);
+  }
+}
 
-      container.innerHTML = wishlist.map(item => `
-        <div class="wishlist-item" data-product-id="${item.productId}">
-          <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
-          <strong>${item.product.title}</strong> (${item.product.price.toLocaleString()}원)
-          <button class="remove-wishlist-btn" style="margin-left: 10px;">♥</button>
-        </div>
-      `).join('');
+
+const container = document.getElementById("wishlist-container");
+
+if (!validatedWishlist.length) {
+  container.innerHTML = "<p>찜한 상품이 없습니다.</p>";
+  return;
+}
+
+container.innerHTML = validatedWishlist.map(item => `
+  <div class="wishlist-item" data-product-id="${item.productId}">
+    <img src="${item.product.image}" style="width: 80px; height: 80px; object-fit: cover; margin-right: 10px;" />
+    <strong>${item.product.title}</strong> (${item.product.price.toLocaleString()}원)
+    <button class="remove-wishlist-btn" style="margin-left: 10px;">♥</button>
+  </div>
+`).join('');
+
 
       // ✅ 찜한 상품 클릭 시 상세 페이지로 이동
 document.querySelectorAll(".wishlist-item").forEach(item => {

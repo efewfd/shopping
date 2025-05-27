@@ -151,6 +151,43 @@
     </div>
   </div>
   <script>
+
+// ✅ 1. 장바구니 유효성 검사
+window.addEventListener("DOMContentLoaded", async () => {
+  await validateCart();       // 삭제된 상품 자동 제거
+  renderCartItems();          // 장바구니 항목 테이블 렌더링
+  attachOrderButton();        // 주문 버튼 이벤트 연결
+});
+
+async function validateCart() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const validatedCart = [];
+
+  for (const item of cart) {
+    try {
+      const res = await fetch(`/api/products/${item.id}`);
+      if (res.ok) {
+        const product = await res.json();
+        if (product) validatedCart.push(item);
+      }
+    } catch (err) {
+      console.warn("❌ 유효하지 않은 상품:", item.id);
+    }
+  }
+
+  localStorage.setItem("cart", JSON.stringify(validatedCart));
+}
+
+function attachOrderButton() {
+  const orderBtn = document.getElementById("order-button");
+  if (orderBtn) {
+    orderBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      submitCheckedOrders(); // ✅ 너가 정의한 주문 함수
+    });
+  }
+}
+
   async function submitAllOrders() {
   const userId = localStorage.getItem("userId");
   if (!userId) {
@@ -168,18 +205,6 @@
   location.href = "checkout.html";
 }
 
-
-
-// 주문 버튼에 클릭 이벤트 연결
-window.addEventListener('DOMContentLoaded', () => {
-  const orderBtn = document.getElementById("order-button");
-  if (orderBtn) {
-    orderBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      submitCheckedOrders(); // ✅ cart.js 안에 정의되어 있어야 함
-    });
-  }
-});
 
   </script>
 
