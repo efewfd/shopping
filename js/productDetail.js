@@ -6,26 +6,34 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (!productId) return;
 
   try {
-    const res = await fetch(`/api/products/${productId}`);
-    const product = await res.json();
+const res = await fetch(`/api/products/${productId}`);
 
-    // 화면에 반영
-    document.querySelector('.detail-image img').src = product.image_url;
-    document.querySelector('.product-code').textContent = `상품번호: ${product._id}`;
-    document.querySelector('.product-title').textContent = product.name;
-    document.querySelector('.original-price').textContent = `${parseInt(product.price).toLocaleString()}원`;
+  if (!res.ok) {
+    throw new Error("서버 응답 실패");
+  }
 
-    // 장바구니/찜용 저장
-    window.productForCart = {
-      id: product._id,
-      code: product._id, // 찜 토글에서 이 값 사용
-      title: product.name || product.title || "이름없음",
-      price: product.price,
-      image: product.image_url,
-      stock: product.stock
-    };
-console.log("🧪 productForCart 저장됨:", window.productForCart);
-    // 이 시점 이후에 버튼 이벤트 연결
+  const product = await res.json();
+
+  // ❗ null 체크
+  if (!product || !product.image_url) {
+    throw new Error("상품이 존재하지 않거나 이미지 정보 없음");
+  }
+
+  // 화면에 반영
+  document.querySelector('.detail-image img').src = product.image_url;
+  document.querySelector('.product-code').textContent = `상품번호: ${product._id}`;
+  document.querySelector('.product-title').textContent = product.name;
+  document.querySelector('.original-price').textContent = `${parseInt(product.price).toLocaleString()}원`;
+
+  window.productForCart = {
+    id: product._id,
+    code: product._id,
+    title: product.name,
+    price: product.price,
+    image: product.image_url,
+    stock: product.stock
+  };
+  console.log("🧪 productForCart 저장됨:", window.productForCart);
   const wishBtn = document.querySelector('.wishlist');
   if (!window.productForCart) {
   alert('상품 정보를 불러오는 중입니다.');
@@ -47,7 +55,8 @@ console.log("🧪 productForCart 저장됨:", window.productForCart);
   }
 
   } catch (err) {
-    console.error('상품 정보 불러오기 실패:', err);
+    console.error('❌ 상품 정보 불러오기 실패:', err.message);
+    alert('상품 정보를 불러올 수 없습니다.');
   }
 });
 

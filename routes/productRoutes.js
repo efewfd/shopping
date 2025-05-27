@@ -133,10 +133,19 @@ router.get('/random-products', async (req, res) => {
 // 상세 페이지 조회 API
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const { id } = req.params;
+
+    // ✅ 문자열 기반 _id 조회
+    const product = await Product.findOne({ _id: id });
+
+    if (!product) {
+      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    }
+
     res.json(product);
   } catch (err) {
-    res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    console.error('❌ 상품 조회 실패:', err.message);
+    res.status(500).json({ message: '서버 오류', error: err.message });
   }
 });
 
