@@ -76,9 +76,10 @@ router.post(
 
       await db.execute(
         `INSERT INTO products (id, name, price, image_url, stock, category1, category2)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [productId, name, parsedPrice, image_url, parsedStock, category1, category2]
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [productId, name, parsedPrice, image_url, parsedStock, category1, category2List.join(',')]
       );
+
 
       res.json({ message: '상품 등록 완료', product });
 

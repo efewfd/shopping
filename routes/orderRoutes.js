@@ -61,34 +61,43 @@ router.get('/:userId', async (req, res) => {
 router.post('/', async (req, res) => {
   const { userId, productId, quantity, status, product } = req.body;
 
-  // ❗ 누락 방지: title과 image 미리 추출
-  const productTitle = product?.title || "제목없음";
+const productTitle = (product?.title || "").trim() || "제목없음";
   const productImage = product?.image || null;
+
+    console.log("🔥 서버에서 받은 quantity:", quantity);
+  console.log("🔥 서버에서 받은 productId:", productId);
+
+console.log("📦 요청 바디 전체:", req.body);
+console.log("📦 productTitle 최종:", productTitle);
 
   if (!userId || !productId || !productTitle) {
     return res.status(400).json({ message: '필수 항목 누락' });
   }
 
   try {
+    // 1. 주문 저장
     await db.execute(`
       INSERT INTO orders (
-        user_id,
-        product_id,
-        quantity,
-        status,
-        product_title,
-        product_image
+        user_id, product_id, quantity, status, product_title, product_image
       ) VALUES (?, ?, ?, ?, ?, ?)
     `, [
-      userId,
-      productId,
-      quantity || 1,
-      status || '결제완료',
-      productTitle,
-      productImage
+      userId, productId, quantity || 1, status || '결제완료', productTitle, productImage
     ]);
 
-    console.log("✅ 주문 등록 완료:", productTitle);
+    // 2. 재고 감소
+    const [result] = await db.execute(`
+      UPDATE products
+      SET stock = stock - ?
+      WHERE id = ? AND stock >= ?
+    `, [quantity, productId, quantity]);
+
+    console.log("🧪 재고 차감 affectedRows:", result.affectedRows);
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({ message: '재고 부족으로 주문이 실패했습니다.' });
+    }
+
+    console.log("✅ 주문 등록 및 재고 차감 완료:", productTitle);
     res.status(201).json({ message: '주문 등록 성공' });
   } catch (err) {
     console.error('🛑 주문 등록 실패:', err);

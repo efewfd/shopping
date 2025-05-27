@@ -32,10 +32,19 @@ category1Select.addEventListener('change', () => {
 document.querySelector("#product-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = e.target;
+
+  // ✅ id가 비어 있으면 UUID 자동 생성
+  if (!form.id.value) {
+    form.id.value = crypto.randomUUID(); // 브라우저 내장 UUID 생성기
+  }
+console.log("✅ 최종 등록할 상품 ID:", form.id.value);
+
+
   const formData = new FormData(form);
 
   console.log("선택한 1차 카테고리:", form.category1.value);
   console.log("선택한 2차 카테고리:", form.category2.value);
+  console.log("✅ 최종 등록될 상품 ID:", form.id.value); // 디버깅용
 
   const res = await fetch("/api/products", {
     method: "POST",
@@ -47,6 +56,7 @@ document.querySelector("#product-form").addEventListener("submit", async (e) => 
   form.reset();
   loadProducts();
 });
+
 
 // 상품 목록 불러오기
 async function loadProducts() {
