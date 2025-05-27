@@ -93,7 +93,7 @@
 
 
         <div class="section">
-          <div class="section-title">최근 주문 내역</div>
+          <div class="section-title">주문 내역</div>
           <div id="order-container">불러오는 중...</div>
         </div>
 
@@ -185,6 +185,18 @@
           <button class="remove-wishlist-btn" style="margin-left: 10px;">♥</button>
         </div>
       `).join('');
+
+      // ✅ 찜한 상품 클릭 시 상세 페이지로 이동
+document.querySelectorAll(".wishlist-item").forEach(item => {
+  item.addEventListener("click", (e) => {
+    if (e.target.classList.contains("remove-wishlist-btn")) return; // ♥ 버튼 제외
+    const productId = item.dataset.productId;
+    if (productId) {
+      window.location.href = `/productDetail.html?id=${productId}`;
+    }
+  });
+});
+
 
     } catch (error) {
       console.error("찜 목록 불러오기 실패:", error);
