@@ -19,7 +19,7 @@ const popularRoutes = require('./routes/popularRoutes');
 
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 //반드시 라우터 보다 먼저 위치
 app.use(express.urlencoded({ extended: true }));
@@ -36,10 +36,14 @@ const wishlistRoutes = require('./routes/wishlist');
 app.use('/api/wishlist', wishlistRoutes);
 
 // MongoDB 연결
-mongoose.connect('mongodb+srv://wsx03sd:jayoung038@cluster0.xh5fwpe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
-}).then(() => console.log('✅ MongoDB 연결 완료'))
-  .catch(err => console.error('❌ MongoDB 연결 실패:', err));
-
+mongoose.connect(
+  'mongodb+srv://wsx03sd:jayoung038@cluster0.khjefrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+  { useNewUrlParser: true, useUnifiedTopology: true }
+).then(() => {
+  console.log('✅ MongoDB 연결 완료');
+}).catch(err => {
+  console.error('❌ MongoDB 연결 실패:', err);
+});
 // 이미지 업로드 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),

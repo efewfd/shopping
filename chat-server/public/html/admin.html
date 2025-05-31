@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>관리자 채팅</title>
+  <link href="/css/admin.css" rel="stylesheet" />
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <h3>고객 목록</h3>
+    <div id="active-customers"></div>
+  </div>
+
+  <div class="chat-area">
+    <h2 id="chatTitle">고객 채팅</h2>
+    <div id="chat"></div>
+    <div class="chat-input">
+      <textarea id="msgInput" rows="2" placeholder="메시지를 입력하세요..."></textarea>
+      <button onclick="sendMsg()">전송</button>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
