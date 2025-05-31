@@ -131,4 +131,42 @@ router.get('/logout', (req, res) => {
   });
 });
 
+
+// 아이디 찾기
+router.post('/find-id', async (req, res) => {
+  const { email } = req.body;
+  const [rows] = await db.execute('SELECT user_id FROM users WHERE email = ?', [email]);
+
+  if (rows.length === 0) {
+    return res.status(404).json({ message: '해당 이메일로 등록된 아이디가 없습니다.' });
+  }
+
+  res.json({ userId: rows[0].user_id });
+});
+
+
+// 비밀번호 찾기
+router.post('/find-password', async (req, res) => {
+  const { userId, email } = req.body;
+  const [rows] = await db.execute('SELECT password FROM users WHERE user_id = ? AND email = ?', [userId, email]);
+
+  if (rows.length === 0) {
+    return res.status(404).json({ message: '아이디 또는 이메일이 일치하지 않습니다.' });
+  }
+
+  // ⚠️ 개발용만 허용, 실사용 시 이메일 발송 또는 리셋 유도
+  res.json({ password: rows[0].password });
+});
+
+
+// 비밀번호 재설정
+router.post('/reset-password', async (req, res) => {
+  const { userId, newPassword } = req.body;
+  const hashedPw = await bcrypt.hash(newPassword, 10);
+
+  await db.execute('UPDATE users SET password = ? WHERE user_id = ?', [hashedPw, userId]);
+
+  res.json({ message: '비밀번호가 변경되었습니다.' });
+});
+
 module.exports = router;
