@@ -68,3 +68,34 @@ li:hover .sub-category {
     object-fit: cover;    /* 비율 유지하면서 꽉 채우기 */
     margin-top: 20px;
 }
+
+.popular-section {
+  background: #f9f9f9;
+  border-top: 1px solid #ddd;
+}
+
+.popular-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.popular-item {
+  width: 180px;
+  padding: 10px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.popular-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.popular-item .rank {
+  font-weight: bold;
+  color: red;
+}

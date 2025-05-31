@@ -10,11 +10,14 @@ const wishlistSchema = new mongoose.Schema({
     required: true
   },
   product: {
-    title: String,
-    price: Number,
+    title: { type: String, required: true },
+    price: { type: Number, required: true },
     image: String,
     stock: Number
   }
 });
+
+// ✅ 유저별 상품 중복 찜 방지
+wishlistSchema.index({ userId: 1, productId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Wishlist', wishlistSchema);

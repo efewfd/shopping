@@ -13,7 +13,9 @@ const userRoutes = require('./routes/user'); // 경로 맞게 수정
 const faqRoutes = require('./routes/faq');
 const orderRoutes = require('./routes/orderRoutes');
 const db = require('./js/db');
+const Review = require('./models/review');
 const reviewRoutes = require('./routes/reviewRoutes');
+const popularRoutes = require('./routes/popularRoutes');
 
 
 const app = express();
@@ -82,7 +84,6 @@ app.use('/admin', express.static(path.join(__dirname, 'Html', 'admin')));
 
 
 // 상품 API 연결
-app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 
@@ -90,6 +91,8 @@ app.use('/api/cart', cartRoutes);
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Html', 'home.html'));
 });
+app.use('/api/products/popular', popularRoutes); 
+app.use('/api/products', productRoutes);
 app.use('/top', express.static(path.join(__dirname, 'Html', 'top'))); // 정적으로 처리 -> top 파일 안의 html 자동으로 매핑
 app.use('/bottom', express.static(path.join(__dirname, 'Html', 'bottom'))); // 정적으로 처리 -> bottom 파일 안의 html 자동으로 매핑
 app.use('/dress', express.static(path.join(__dirname, 'Html', 'dress'))); // 정적으로 처리 -> dress 파일 안의 html 자동으로 매핑
@@ -105,6 +108,7 @@ app.use('/api/faqs', faqRoutes);
 // 주문/결제
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
+
 
 // 관리자 페이지 라우팅
 app.get('/admin', (req, res) => {
