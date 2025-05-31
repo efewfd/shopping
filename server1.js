@@ -13,6 +13,7 @@ const userRoutes = require('./routes/user'); // 경로 맞게 수정
 const faqRoutes = require('./routes/faq');
 const orderRoutes = require('./routes/orderRoutes');
 const db = require('./js/db');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 
 const app = express();
@@ -103,6 +104,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/faqs', faqRoutes);
 // 주문/결제
 app.use('/api/orders', orderRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // 관리자 페이지 라우팅
 app.get('/admin', (req, res) => {

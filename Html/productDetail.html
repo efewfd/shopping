@@ -94,6 +94,48 @@
         <button class="btn-cart" onclick="addToCart(window.productForCart)">장바구니 담기</button>
         <button onclick="addToCartAndGo()">구매하기</button>
       </div>
+<!-- 후기 토글 버튼 -->
+      <div class="review-controls" style="margin-top: 20px;">
+        <button id="toggle-review-list-btn">구매후기</button>
+      </div>
+
+      <!-- 리뷰 영역 (리뷰쓰기 버튼 + 리스트 + 입력창) -->
+      <div id="review-area" style="display: none;">
+        <!-- 정렬 필터 -->
+        <div>
+          <!-- <label><i class="fas fa-filter"></i></label> -->
+          <select id="review-sort">
+            <option value="latest">최신순</option>
+            <option value="rating-high">별점 높은순</option>
+            <option value="rating-low">별점 낮은순</option>
+          </select>
+        </div>
+        <!-- 리뷰 쓰기 버튼 -->
+        <button id="toggle-review-write-btn" style="margin-top: 10px;">리뷰쓰기</button>
+
+        <!-- 리뷰 입력창 (처음엔 숨김) -->
+        <div id="review-form" style="display: none; margin-top: 10px;">
+          <div id="rating-stars">
+            <span data-value="1">⭐</span>
+            <span data-value="2">⭐</span>
+            <span data-value="3">⭐</span>
+            <span data-value="4">⭐</span>
+            <span data-value="5">⭐</span>
+          </div>
+          <textarea id="review-content" rows="4" style="width: 100%;" placeholder="리뷰를 작성하세요..."></textarea>
+          <br />
+          <button onclick="submitReview()">등록</button>
+        </div>
+
+        <!-- 리뷰 리스트 -->
+        <div id="review-list" style="margin-top: 20px;">
+          <p>불러오는 중...</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px;">
+          <button id="load-more-btn" style="display: none;">더보기</button>
+        </div>
+      
     </div>
   </div>
 
