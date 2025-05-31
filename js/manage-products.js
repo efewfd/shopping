@@ -66,18 +66,32 @@ async function loadProducts() {
   const res = await fetch("/api/products");
   const products = await res.json();
   const validatedProducts = [];
+  const isMongoObjectId = /^[a-f0-9]{24}$/;
+for (const p of products) {
+let pid;
+if (typeof p.id === 'string') {
+  pid = p.id;
+} else if (typeof p.id === 'object' && typeof p.id.id === 'string') {
+  pid = p.id.id;
+} else {
+  pid = p._id;
+}
 
-  for (const p of products) {
-    try {
-      const check = await fetch(`/api/products/${p._id}`);
-      if (check.ok) {
-        const realProduct = await check.json();
-        if (realProduct) validatedProducts.push(realProduct);
-      }
-    } catch (err) {
-      console.warn(`❌ 유효하지 않은 상품: ${p._id}`);
+
+
+  // Mongo ObjectId 필터링 
+  if (!pid || isMongoObjectId.test(pid)) continue;
+  try {
+    const check = await fetch(`/api/products/${pid}`);
+    if (check.ok) {
+      const realProduct = await check.json();
+      if (realProduct) validatedProducts.push(realProduct);
     }
+  } catch (err) {
+    console.warn(`❌ 유효하지 않은 상품: ${pid}`);
   }
+}
+
 
   validatedProducts.forEach(product => {
     const pid = product.id || product._id;

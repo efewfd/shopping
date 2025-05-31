@@ -20,17 +20,19 @@ async function loadCategoryProducts() {
 const validatedProducts = [];
 
 for (const item of products) {
-  // ✅ 상품 ID 유효성 체크 (빈 문자열, undefined 등 제거)
-  if (!item || !item._id || typeof item._id !== 'string') {
+  const pid = typeof item.id === 'string'
+    ? item.id
+    : (typeof item._id === 'string' ? item._id : null);
+
+  if (!pid) {
     console.warn("❌ 유효하지 않은 상품 ID:", item);
     continue;
   }
 
-  // ✅ 상품이 백엔드에 존재하는지 확인
   try {
-    const res = await fetch(`/api/products/${item._id}`);
+    const res = await fetch(`/api/products/${pid}`);
     if (!res.ok) {
-      console.warn(`❌ 삭제된 상품 ID: ${item._id}`);
+      console.warn(`❌ 삭제된 상품 ID: ${pid}`);
       continue;
     }
 
@@ -39,9 +41,10 @@ for (const item of products) {
       validatedProducts.push(product);
     }
   } catch (err) {
-    console.warn("❌ 상품 확인 실패:", item._id);
+    console.warn("❌ 상품 확인 실패:", pid);
   }
 }
+
 
 
     const container = document.getElementById('product-list');
@@ -56,8 +59,10 @@ for (const item of products) {
       const card = document.createElement('div');
       card.className = 'product-card';
 
+      const pid = product.id || product._id; // ✅ 안전하게 ID 추출
+
       card.innerHTML = `
-        <a href="/productDetail.html?id=${product._id}">
+        <a href="/productDetail.html?id=${pid}">
           <img src="${product.image_url || '/images/default.png'}" alt="${product.name}" />
           <p class="product-name">${product.name}</p>
           <p class="product-price">${parseInt(product.price).toLocaleString()}원</p>
@@ -65,6 +70,7 @@ for (const item of products) {
       `;
       container.appendChild(card);
     });
+
 
   } catch (err) {
     console.error('상품 불러오기 실패:', err);

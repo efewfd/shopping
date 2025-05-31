@@ -28,42 +28,66 @@ router.get('/random-products', async (req, res) => {
   }
 });
 
+// ✅ 상세 조회 (MySQL 기준)
+router.get('/:id', async (req, res) => {
+  const id = req.params.id.trim();
 
-// ✅ 전체 상품 목록 조회
+  try {
+    const [rows] = await db.execute(
+      'SELECT * FROM products WHERE id = ?', 
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ message: '서버 오류', error: err.message });
+  }
+});
+
+
+
+
+// ✅ 전체 상품 목록 조회 (MySQL 기준)
 router.get('/', async (req, res) => {
   try {
     const { category1, category2 } = req.query;
-    const query = {};
+    let sql = 'SELECT * FROM products';
+    const params = [];
+    const where = [];
 
-    if (category1) query.category1 = category1;
-    if (category2) query.category2 = category2;
+    if (category1) {
+      where.push('category1 = ?');
+      params.push(category1);
+    }
 
-    console.log('[상품 목록 요청]', req.query, query);
-    const products = await Product.find(query).sort({ created_at: -1 });
-    res.json(products);
+    // ✅ 'all'이 아닐 때만 category2 필터 적용
+    if (category2 && category2 !== 'all') {
+      where.push('FIND_IN_SET(?, category2)');
+      params.push(category2);
+    }
+
+    if (where.length > 0) {
+      sql += ' WHERE ' + where.join(' AND ');
+    }
+
+    sql += ' ORDER BY created_at DESC';
+
+    const [rows] = await db.execute(sql, params);
+    res.json(rows);
   } catch (err) {
-    console.error('❌ 상품 목록 조회 중 오류:', err);
+    console.error('❌ 상품 목록 조회 실패:', err);
     res.status(500).json({ message: '상품 목록 조회 실패', error: err.message });
   }
 });
 
 
-// ✅ 상세 조회 (UUID 안전)
-router.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const product = await Product.findOne({ _id: id }); // UUID 문자열에 안전
 
-    if (!product) {
-      return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
-    }
 
-    res.json(product);
-  } catch (err) {
-    console.error('❌ 상품 조회 실패:', err.message);
-    res.status(500).json({ message: '서버 오류', error: err.message });
-  }
-});
+
 
 
 // ✅ 상품 등록 (UUID + Mongo + MySQL 동시 저장)
@@ -81,7 +105,7 @@ router.post('/', upload.fields([
     }
 
     const image_url = req.files.image ? `/uploads/${req.files.image[0].filename}` : '';
-    const category2List = [category2, 'all'];
+    const category2List = [category2];
     const productId = id || crypto.randomUUID();
 
     const productData = {
@@ -142,19 +166,28 @@ router.put('/:id', async (req, res) => {
 });
 
 
-// ✅ 상품 삭제
+// ✅ 상품 삭제 (MySQL중심으로)
 router.delete('/:id', async (req, res) => {
+  const id = req.params.id.trim();
+
   try {
-    const deleted = await Product.findOneAndDelete({ _id: req.params.id });
-    if (!deleted) {
+    // ✅ MySQL 삭제
+    const [result] = await db.execute('DELETE FROM products WHERE id = ?', [id]);
+
+    if (result.affectedRows === 0) {
       return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
     }
+
+    // ✅ MongoDB도 함께 정리
+    await Product.findOneAndDelete({ _id: id });
+
     res.json({ message: '상품 삭제 완료' });
   } catch (err) {
     console.error('❌ 상품 삭제 실패:', err);
     res.status(500).json({ message: '삭제 실패', error: err.message });
   }
 });
+
 
 
 module.exports = router;

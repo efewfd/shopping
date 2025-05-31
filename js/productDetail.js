@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (!productId) return;
 
   try {
-const res = await fetch(`/api/products/${productId}`);
+  const res = await fetch(`/api/products/${productId}`);
 
   if (!res.ok) {
     throw new Error("서버 응답 실패");
@@ -22,20 +22,22 @@ const res = await fetch(`/api/products/${productId}`);
 
   const product = await res.json();
 
+    // 화면에 반영
+  document.querySelector('.detail-image img').src = product.image_url;
+  document.querySelector('.product-code').textContent = `상품번호: ${productId}`;
+  document.querySelector('.product-title').textContent = product.name;
+  document.querySelector('.original-price').textContent = `${parseInt(product.price).toLocaleString()}원`;
+
+
   // ❗ null 체크
   if (!product || !product.image_url) {
     throw new Error("상품이 존재하지 않거나 이미지 정보 없음");
   }
 
-  // 화면에 반영
-  document.querySelector('.detail-image img').src = product.image_url;
-  document.querySelector('.product-code').textContent = `상품번호: ${product._id}`;
-  document.querySelector('.product-title').textContent = product.name;
-  document.querySelector('.original-price').textContent = `${parseInt(product.price).toLocaleString()}원`;
 
   window.productForCart = {
-    id: product._id,
-    code: product._id,
+    id: productId,
+    code: productId,
     title: product.name,
     price: product.price,
     image: product.image_url,
@@ -52,6 +54,7 @@ const res = await fetch(`/api/products/${productId}`);
     const matchedOrder = orders.find(order =>
       order.productId === productId && order.status === "배송완료"
     );
+
 
     const reviewWriteBtn = document.getElementById("toggle-review-write-btn");
     if (reviewWriteBtn) {
@@ -77,10 +80,12 @@ const res = await fetch(`/api/products/${productId}`);
 
     // 초기 찜 상태 반영
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    if (wishlist.some(item => item.code === product._id)) {
+    if (wishlist.some(item => item.code === productId)) {
       wishBtn.textContent = "찜 취소";
       wishBtn.classList.add("active");
     }
+
+
   }
 
   } catch (err) {
