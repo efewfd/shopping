@@ -141,7 +141,6 @@ function renderCartItems() {
         <button onclick="changeQuantity('${item.id}', -1)">-</button>
         <span id="qty-${item.id}">${item.quantity || 1}</span>
         <button onclick="changeQuantity('${item.id}', 1)">+</button>
-        <button onclick="updateQuantity('${item.id}')">수정</button>
       </td>
       <td>무료배송</td>
       <td>0원</td>

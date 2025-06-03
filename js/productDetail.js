@@ -129,7 +129,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 
 // 상품 장바구니에 담기
-function addToCart(product) {
+async function addToCart(product) {
+  // ✅ 로그인 여부 확인
+  const res = await fetch('/api/auth/user', { credentials: 'include' });
+  const data = await res.json();
+  if (!data.loggedIn) {
+    alert('로그인이 필요합니다.');
+    window.location.href = '/Login.html';
+    return;
+  }
+
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
   if (cart.some(item => item.id === product.id)) {
@@ -140,7 +149,7 @@ function addToCart(product) {
   const newItem = {
     id: product.id,
     code: product.code,
-    title: product.title || product.name,     // ✅ 안전하게 넣기
+    title: product.title || product.name,
     price: product.price,
     image: product.image,
     stock: product.stock,
@@ -155,7 +164,16 @@ function addToCart(product) {
 
 
 // 장바구니 담기 후 이동
-function addToCartAndGo() {
+async function addToCartAndGo() {
+  // ✅ 로그인 여부 확인
+  const res = await fetch('/api/auth/user', { credentials: 'include' });
+  const data = await res.json();
+  if (!data.loggedIn) {
+    alert('로그인이 필요합니다.');
+    window.location.href = '/Login.html';
+    return;
+  }
+
   const product = window.productForCart;
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -168,7 +186,7 @@ function addToCartAndGo() {
   const newItem = {
     id: product.id,
     code: product.code,
-    title: product.title || product.name,    // ✅ 여기도 추가
+    title: product.title || product.name,
     price: product.price,
     image: product.image,
     stock: product.stock,
@@ -179,6 +197,7 @@ function addToCartAndGo() {
   localStorage.setItem("cart", JSON.stringify(cart));
   window.location.href = "cart.html";
 }
+
 
 
 

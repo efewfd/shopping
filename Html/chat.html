@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+   <meta charset="UTF-8" /> <!-- UTF-8 문자 인코딩 설정 (한글 포함 모든 문자 인식 가능) -->
+   <title>고객 상담</title> <!-- 브라우저 탭에 표시될 제목 -->
+
+   <!-- 공통 CSS 파일 연결 (말풍선, 입력창, 버튼 스타일 등 포함) -->
+   <link rel="stylesheet" href="../Css/style.css" />
+   <link rel="stylesheet" href="../Css/home.css" />
+   <link rel="stylesheet" href="../Css/chat.css" />
+</head>
+
+<!-- ✅ 고객용 뷰 구분을 위한 클래스 -->
+<body class="customer-view">
+     <div class="Navbar">
+    <h1 class="logo"><a href="home.html">Shopping Mall</a></h1>
+    <ul class="products">
+      <li>
+            <a href="./outerwear/outerwear.html">아우터</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./outerwear/coat.html">코트</a></li>
+                <li><a href="./outerwear/jacket.html">자켓</a></li>
+                <li><a href="./outerwear/cardigan.html">가디건</a></li>
+                <li><a href="./outerwear/vest.html">조끼</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./top/consultation.html">상의</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./top/basic.html">기본</a></li>
+                <li><a href="./top/casual.html">캐주얼</a></li>
+                <li><a href="./top/sweatshirt.html">맨투맨</a></li>
+                <li><a href="./top/hoddie.html">후드티</a></li>
+                <li><a href="./top/shirt.html">셔츠</a></li>
+                <li><a href="./top/blouse.html">블라우스</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./bottom/bottom.html">하의</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./bottom/denim.html">데님</a></li>
+                <li><a href="./bottom/short.html">반바지</a></li>
+                <li><a href="./bottom/cotton.html">코튼</a></li>
+                <li><a href="./bottom/leggings.html">레깅스</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./dress/dress.html">원피스</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./dress/dress-min.html">미니</a></li>
+                <li><a href="./dress/dress-long.html">롱</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="./skirt/skirt.html">스커트</a>
+            <div class="sub-category">
+              <ul>
+                <li><a href="./skirt/skirt-min.html">미니</a></li>
+                <li><a href="./skirt/skirt-long.html">롱</a></li>
+              </ul>
+            </div>
+          </li>
+    </ul>
+    <ul class="listbar">
+    </ul>
+  </div>
+  <div class="main-section">
+     <aside class="side-menu">
+        <ul>
+          <li>
+            <a href="myInfo.html">MY 정보</a>
+          </li>
+          <li><a href="cart.html">장바구니</a></li>
+          <li>
+            <a href="delivery.html">배송조회</a>
+          </li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li class="active">1:1 문의</li>
+        </ul>
+      </aside>
+
+   <!-- ✅ 전체 채팅 박스 중앙 정렬 + 고정 폭 설정 -->
+   <div class="chat-wrapper">
+
+      <!-- ✅ 채팅 메시지가 표시되는 영역 -->
+      <div id="chat"></div>
+
+      <!-- ✅ 메시지 입력창 및 버튼 그룹 -->
+      <div id="controls">
+
+         <!-- 🔵 업로드용 동그란 + 버튼 -->
+         <button id="uploadBtn" title="파일 업로드">+</button>
+
+         <!-- ✅ 실제 파일 선택용 input (숨김 처리) -->
+         <form style="display: none;">
+            <input type="file" id="fileInput" name="image" accept="image/*" />
+         </form>
+
+         <!-- 🔸 메시지 입력 영역 (줄바꿈 허용, 테두리 적용됨) -->
+         <textarea
+            id="msgInput"
+            placeholder="문의하실 내용을 입력해주세요"
+            rows="2"
+         ></textarea>
+
+         <!-- ✅ 버튼 2개 가로 정렬: 보내기 / 문의 종료 -->
+         <div class="button-row">
+            <button onclick="sendMsg()">보내기</button>
+            <button onclick="endInquiry()">문의 종료</button>
+         </div>
+      </div>
+   </div>
+  </div>
+
+  
+   </div>
+
+   <!-- ✅ Socket.IO 클라이언트 라이브러리 (서버 연결) -->
+   <script src="/socket.io/socket.io.js"></script>
+
+   <!-- ✅ 고객용 JavaScript 파일 (이름 등록, 메시지 처리, 이미지 업로드 포함) -->
+   <script src="../js/chat.js" defer></script>
+
+</body>
+</html>

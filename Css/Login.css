@@ -56,3 +56,10 @@
 .SingUp-page {
     text-align: center;
 }
+
+/* 아이디/비밀번호 찾기 링크 정렬 및 크기 조정 */
+.find-links {
+  text-align: center;
+  font-size: 12px;  /* 조금 작게 */
+  color: #555;
+}

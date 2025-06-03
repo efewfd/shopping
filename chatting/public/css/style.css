@@ -1,0 +1,502 @@
+/* ============================ */
+/* 🔷 전체 공통 스타일 */
+/* ============================ */
+
+body {
+   font-family: sans-serif;
+   padding: 20px;
+   height: auto;
+   margin: 0;
+   display: flex;
+   flex-direction: column;
+   box-sizing: border-box;
+}
+
+input,
+button {
+   font-size: 14px;
+   padding: 6px;
+   box-sizing: border-box;
+}
+
+/* ============================ */
+/* 🔷 채팅 전체 감싸는 컨테이너 */
+/* ============================ */
+
+.chat-wrapper {
+   display: flex;
+   flex-direction: column;
+   height: auto;
+   flex-grow: 0;
+   padding: 10px;
+   box-sizing: border-box;
+   width: 100%;
+   max-width: 1000px;
+   margin: 0 auto;
+}
+
+/* ✅ 관리자용 채팅 전체 박스 (오른쪽 채팅 영역 박스 테두리용) */
+.admin-view .chat-area {
+   border: 1px solid #ccc;
+   padding: 10px;
+   border-radius: 10px;
+   box-sizing: border-box;
+   background-color: #fff;
+}
+
+.customer-view .chat-wrapper {
+   border: 1px solid #ccc;
+   border-radius: 10px;
+   background-color: #fff;
+   padding: 10px;
+   box-sizing: border-box;
+}
+
+/* ============================ */
+/* 🔷 채팅창 공통 영역 스타일 */
+/* ============================ */
+
+#chat {
+   flex-grow: 1;
+   overflow-y: scroll;
+   padding: 10px;
+   border-bottom: 1px solid #ccc;
+   margin-bottom: 10px;
+   height: 300px;
+}
+
+#controls {
+   display: flex;
+   gap: 10px;
+   align-items: center;
+   padding-top: 5px;
+}
+
+#uploadBtn {
+   width: 34px;
+   height: 34px;
+   border-radius: 50%;
+   background-color: #ffafaf;
+   border: none;
+   font-size: 20px;
+   font-weight: bold;
+   color: white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   cursor: pointer;
+   padding: 0;
+   transition: background-color 0.2s ease;
+}
+
+#uploadBtn:hover {
+   background-color: #e67373;
+}
+
+#controls textarea {
+   flex-grow: 1;
+   resize: none;
+   font-size: 14px;
+   padding: 4px 10px;
+   min-height: 28px;
+   box-sizing: border-box;
+   line-height: 1.4;
+   border: 1px solid #999;
+   border-radius: 20px;
+}
+
+.button-row {
+   display: flex;
+   gap: 8px;
+}
+
+.admin-view .button-row button,
+.customer-view .button-row button {
+   width: 100px;
+   cursor: pointer;
+   background-color: white;
+   border: 1px solid #999;
+   border-radius: 8px;
+   font-weight: bold;
+   transition: background-color 0.2s ease;
+}
+
+.admin-view .button-row button:active,
+.customer-view .button-row button:active {
+   background-color: #ffafaf;
+   color: white;
+   border-color: #e67373;
+}
+
+.button-row button:focus {
+   outline: none;
+}
+
+/* ============================ */
+/* 🔷 날짜 말풍선 */
+/* ============================ */
+
+.date-bubble {
+   display: block;
+   margin: 0 auto 10px auto;
+   background-color: #e8a7a7;
+   color: white;
+   font-size: 13px;
+   padding: 4px 12px;
+   border-radius: 20px;
+   width: fit-content;
+   text-align: center;
+}
+
+/* ============================ */
+/* 🔷 관리자 화면 - 고객 목록 영역 */
+/* ============================ */
+
+#users {
+   width: 150px;
+   border: 1px solid #ccc;
+   padding: 10px;
+   height: 350px;
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+}
+
+#users button {
+   width: 100%;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   padding: 6px 8px;
+   font-size: 14px;
+   text-align: left;
+   line-height: 1.4;
+}
+
+.user-alert {
+   display: inline-block;
+   width: 8px;
+   height: 8px;
+   background-color: red;
+   border-radius: 50%;
+   margin-left: 6px;
+   vertical-align: middle;
+}
+
+/* ============================ */
+/* 🔷 채팅 말풍선 스타일 */
+/* ============================ */
+
+/* ✅ 채팅 말풍선 박스 */
+.chat-msg {
+   display: flex;
+   align-items: flex-end;
+   justify-content: flex-end; /* 기본 오른쪽 정렬 */
+   width: 100%;                /* 💡 이거 추가해보세요 */
+   max-width: 100%;
+   margin: 8px 0;
+   word-break: break-word;
+   font-size: 14px;
+}
+
+/* ✅ 말풍선과 시간/읽음 정보를 묶는 wrapper */
+.msg-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 80%;
+}
+
+/* 말풍선과 시간/읽음 정렬 방향 */
+.customer-view .chat-msg.customer .msg-wrapper {
+  justify-content: flex-end; /* 고객이 보낸 메시지 → 오른쪽 정렬 */
+}
+
+.customer-view .chat-msg.admin .msg-wrapper {
+  justify-content: flex-start; /* 고객이 받은 메시지 → 왼쪽 정렬 */
+}
+
+/* ✅ 말풍선 */
+.msg-bubble {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background-color: #f1f0f0;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+/* ✅ 말풍선 옆 시간 + 읽음 묶음 */
+.msg-meta {
+  font-size: 12px;
+  color: gray;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* ✅ 이미지 포함 말풍선 대응 */
+.msg-bubble img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 4px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.msg-time {
+   font-size: 12px;
+   color: gray;
+   white-space: nowrap;
+   vertical-align: bottom;
+}
+
+.admin-view .chat-msg.admin,
+.customer-view .chat-msg.customer {
+   flex-direction: row;
+}
+
+.admin-view .chat-msg.customer,
+.customer-view .chat-msg.admin {
+   flex-direction: row;
+}
+
+.admin-view .chat-msg.admin .msg-time,
+.customer-view .chat-msg.customer .msg-time {
+   order: 0;
+   margin-right: 6px;
+}
+
+.admin-view .chat-msg.customer .msg-time,
+.customer-view .chat-msg.admin .msg-time {
+   order: 2;
+   margin-left: 6px;
+}
+
+.admin-view .chat-msg.admin,
+.customer-view .chat-msg.customer {
+   justify-content: flex-end;
+}
+
+.admin-view .chat-msg.customer,
+.customer-view .chat-msg.admin {
+   justify-content: flex-start;
+}
+
+.admin-view .chat-msg.admin .msg-bubble,
+.customer-view .chat-msg.customer .msg-bubble {
+   background-color: #e8a7a7;
+   color: white;
+}
+
+.admin-view .chat-msg.customer .msg-bubble,
+.customer-view .chat-msg.admin .msg-bubble {
+   background-color: #f1f0f0;
+   color: black;
+}
+
+/* ============================ */
+/* 🔷 문의 종료 메시지 스타일 */
+/* ============================ */
+
+#chat > .end-msg {
+   text-align: center;
+   color: red;
+   font-weight: bold;
+   margin-top: 20px;
+}
+
+/* ============================ */
+/* 🔷 메시지 읽음 상태 아이콘 스타일 */
+/* ============================ */
+
+.read-status {
+   font-size: 12px;
+   color: gray;
+   margin-right: 6px;
+   vertical-align: middle;
+}
+
+.read-status.✔️ {
+   color: green;
+}
+
+.read-status.⌛ {
+   color: red;
+}
+
+/* ============================ */
+/* 🔷 채팅 제목 스타일 */
+/* ============================ */
+
+.chat-title {
+   border-bottom: 1px solid #999;
+   padding-bottom: 8px;
+   margin-bottom: 12px;
+   text-align: center;
+}
+
+/* ============================ */
+/* 🔷 고객 목록 전체 영역 */
+/* ============================ */
+
+#customer-section {
+   width: 180px;
+   box-sizing: border-box;
+   text-align: center;
+}
+
+#customer-section h3 {
+   border-bottom: 1px solid #999;
+   padding-bottom: 6px;
+   margin-bottom: 10px;
+}
+
+.tab-container {
+   display: flex;
+   gap: 6px;
+   margin-bottom: 10px;
+}
+
+.tab-button {
+   flex: 1;
+   background-color: #ffffff;
+   border: none;
+   padding: 6px 12px;
+   border-radius: 10px;
+   font-weight: bold;
+   font-size: 14px;
+   cursor: pointer;
+   box-sizing: border-box;
+   text-align: center;
+}
+
+.tab-button.active {
+   background-color: #ffafaf;
+   color: white;
+   border: 2px solid #e67373;
+}
+
+/* ============================ */
+/* 🔷 고객 목록 스타일 */
+/* ============================ */
+
+.customer-list {
+   width: 100%;
+   border: 1px solid #ccc;
+   padding: 10px;
+   height: 350px;
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+   gap: 8px;
+   box-sizing: border-box;
+}
+
+.customer-list button {
+   width: 100%;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   padding: 6px 8px;
+   font-size: 14px;
+   text-align: left;
+   line-height: 1.4;
+   border: 1px solid #aaa;
+   border-radius: 8px;
+   background-color: white;
+   cursor: pointer;
+   box-sizing: border-box;
+}
+
+.customer-list button.selected {
+   background-color: #fbcfcf;
+   font-weight: bold;
+}
+
+/* ============================ */
+/* 🔷 금지어 관리 UI 영역 */
+/* ============================ */
+
+#forbidden-section {
+   margin-top: 20px;
+   text-align: left;
+}
+
+#forbidden-section input {
+   width: 100%;
+   margin-bottom: 8px;
+   border: 1px solid #aaa;
+   border-radius: 6px;
+   padding: 6px;
+   box-sizing: border-box;
+}
+
+#forbidden-section button {
+   width: 100%;
+   background-color: #ffafaf;
+   border: none;
+   border-radius: 6px;
+   color: white;
+   font-weight: bold;
+   padding: 6px;
+   cursor: pointer;
+   margin-bottom: 12px;
+   box-sizing: border-box;
+}
+
+#banList {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+   max-height: 200px;
+   overflow-y: auto;
+}
+
+#banList li {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 4px 6px;
+   border-bottom: 1px solid #ccc;
+   font-size: 14px;
+   word-break: break-word;
+}
+
+/* ✅ 금지어 삭제 버튼 스타일 (SVG 아이콘 포함용) */
+#banList li button {
+   background-color: white;
+   color: #e57373;
+   border: 1px solid #e57373;
+   border-radius: 4px;
+   padding: 2px;
+   font-size: 0;                 /* 텍스트 숨기고 SVG만 보이게 */
+   width: 20px;
+   height: 20px;
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+/* ✅ SVG 아이콘 크기 및 색상 조정 */
+#banList li button svg {
+   width: 12px;
+   height: 12px;
+   fill: #e57373;
+   pointer-events: none;
+}
+
+/* 🔷 금지어 목록 스크롤 영역 감싸기 */
+.ban-list-container {
+   max-height: 160px;
+   overflow-y: auto;
+   border: 1px solid #ccc;
+   border-radius: 6px;
+   padding: 6px;
+   background-color: #fff;
+   box-sizing: border-box;
+   margin-top: 8px;
+}

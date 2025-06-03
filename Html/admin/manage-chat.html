@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+   <meta charset="UTF-8" /> <!-- 한글 포함 모든 문자를 올바르게 표시하기 위한 문자 인코딩 설정 -->
+   <title>상담원 채팅</title> <!-- 브라우저 탭에 표시될 페이지 제목 -->
+
+   <!-- 공통 스타일 파일 연결 (화면 구성 및 말풍선, 입력창, 버튼 등의 UI 스타일 적용) -->
+   <link rel="stylesheet" href="../../Css/style.css" />
+   <link rel="stylesheet" href="../../Css/admin.css" />
+</head>
+
+<!-- 관리자용 화면임을 나타내는 클래스 (말풍선 정렬, 색상 등에 사용됨) -->
+<body class="admin-view">
+     <header>
+  <h1>주문 관리</h1>
+  <nav>
+    <ul>
+      <li><a href="/admin/manage-products.html">상품 관리</a></li>
+      <li><a href="/admin/manage-orders.html">주문 관리</a></li>
+      <li><a href="/admin/manage-users.html">회원 관리</a></li>
+      <li><a href="/admin/manage-faq.html">faq 관리</a></li>
+      <li><a href="/admin/manage-chat.html">채팅 관리</a></li>
+    </ul>
+  </nav>
+  </header>
+
+   <!-- 전체 화면을 좌우로 나누기 위한 flex 컨테이너 -->
+   <div style="display: flex; gap: 20px; align-items: flex-start;">
+
+      <!-- 🔹 왼쪽 영역: 고객 목록 + 금지어 관리 -->
+      <div id="customer-section">
+         <h3>고객 목록</h3>
+
+         <!-- 고객 유형 전환 버튼 (현재 고객 / 종료된 고객) -->
+         <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+            <button id="activeBtn" class="tab-button active">현재 고객</button>
+            <button id="endedBtn" class="tab-button">종료 고객</button>
+         </div>
+
+         <!-- ✅ 현재 고객 목록이 표시될 영역 -->
+         <div id="active-customers" class="customer-list">
+            <!-- JavaScript에서 동적으로 고객 버튼 생성됨 -->
+         </div>
+
+         <!-- ✅ 종료된 고객 목록이 표시될 영역 -->
+         <div id="ended-customers" class="customer-list" style="display: none;">
+            <!-- JavaScript에서 동적으로 종료된 고객 버튼 생성됨 -->
+         </div>
+
+         <!-- ✅ 목록 아래 구분선 역할 -->
+         <div class="customer-divider"></div>
+
+         <!-- ✅ 금지어 관리 UI -->
+         <div id="forbidden-section">
+            <h3>금지어 관리</h3>
+
+            <!-- 금지어 입력 필드 및 추가 버튼 -->
+            <input type="text" id="banInput" placeholder="금지어 입력" />
+            <button onclick="addForbidden()">추가</button>
+
+            <!-- 🔃 금지어 목록을 스크롤 가능한 박스로 감싸기 -->
+            <div class="ban-list-container">
+               <ul id="banList">
+                  <!-- 각 항목은 JS에서 동적으로 생성됨 -->
+                  <!-- 예시: <li>욕설 <button class="delete-btn"><svg>...</svg></button></li> -->
+               </ul>
+            </div>
+         </div>
+      </div>
+
+      <!-- 🔸 오른쪽 영역: 채팅창 + 입력창 -->
+      <div class="chat-wrapper"> <!-- ✅ 전체 박스 시작 -->
+         <h2 class="chat-title">1:1 문의</h2>
+
+         <div class="chat-area"> <!-- ✅ 박스 안에 채팅창-->
+            <!-- 채팅 메시지가 표시되는 영역 -->
+            <div id="chat"></div>
+            <!-- 메시지 입력과 전송 버튼이 있는 컨트롤 영역 (Enter로 전송, Shift+Enter는 줄바꿈 가능) -->
+            <div id="controls">
+               <textarea id="msgInput" placeholder="메시지를 입력하세요" rows="2"></textarea>
+               <div class="button-row">
+                  <button onclick="sendMsg()">보내기</button> <!-- 버튼 클릭 시 sendMsg() 함수 실행 -->
+               </div>
+            </div>
+         </div>
+      </div> <!-- ✅ 전체 박스 끝 -->
+   </div>
+
+   <!-- Socket.IO 클라이언트 라이브러리 불러오기 (서버와 실시간 연결을 위한 필수 스크립트) -->
+   <script src="/socket.io/socket.io.js"></script>
+
+   <!-- 관리자용 JavaScript 파일 연결 (고객 선택, 메시지 송수신, 종료 처리 등 핵심 로직 포함) -->
+   <script src="../../js/manage-chat.js" defer></script>
+
+</body>
+</html>

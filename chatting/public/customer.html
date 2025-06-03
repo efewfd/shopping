@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+   <meta charset="UTF-8" /> <!-- UTF-8 문자 인코딩 설정 (한글 포함 모든 문자 인식 가능) -->
+   <title>고객 상담</title> <!-- 브라우저 탭에 표시될 제목 -->
+
+   <!-- 공통 CSS 파일 연결 (말풍선, 입력창, 버튼 스타일 등 포함) -->
+   <link rel="stylesheet" href="css/style.css?v=3" />
+</head>
+
+<!-- ✅ 고객용 뷰 구분을 위한 클래스 -->
+<body class="customer-view">
+
+   <!-- ✅ 전체 채팅 박스 중앙 정렬 + 고정 폭 설정 -->
+   <div class="chat-wrapper">
+
+      <!-- ✅ 채팅 메시지가 표시되는 영역 -->
+      <div id="chat"></div>
+
+      <!-- ✅ 메시지 입력창 및 버튼 그룹 -->
+      <div id="controls">
+
+         <!-- 🔵 업로드용 동그란 + 버튼 -->
+         <button id="uploadBtn" title="파일 업로드">+</button>
+
+         <!-- ✅ 실제 파일 선택용 input (숨김 처리) -->
+         <form style="display: none;">
+            <input type="file" id="fileInput" name="image" accept="image/*" />
+         </form>
+
+         <!-- 🔸 메시지 입력 영역 (줄바꿈 허용, 테두리 적용됨) -->
+         <textarea
+            id="msgInput"
+            placeholder="문의하실 내용을 입력해주세요"
+            rows="2"
+         ></textarea>
+
+         <!-- ✅ 버튼 2개 가로 정렬: 보내기 / 문의 종료 -->
+         <div class="button-row">
+            <button onclick="sendMsg()">보내기</button>
+            <button onclick="endInquiry()">문의 종료</button>
+         </div>
+      </div>
+   </div>
+
+   <!-- ✅ Socket.IO 클라이언트 라이브러리 (서버 연결) -->
+   <script src="/socket.io/socket.io.js"></script>
+
+   <!-- ✅ 고객용 JavaScript 파일 (이름 등록, 메시지 처리, 이미지 업로드 포함) -->
+   <script src="js/customer.js?v=5" defer></script>
+
+</body>
+</html>
