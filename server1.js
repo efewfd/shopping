@@ -54,7 +54,7 @@ function containsForbiddenWords(message) {
 
 // MongoDB 연결
 mongoose.connect(
-  'mongodb+srv://wsx03sd:jayoung038@cluster0.khjefrp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {}
+  'mongodb+srv://cd1:capstonedesign1@cluster0.snijqi4.mongodb.net/chatdb?retryWrites=true&w=majority&appName=Cluster0', {}
 ).then(async () => {
   console.log('✅ MongoDB 연결 완료');
 

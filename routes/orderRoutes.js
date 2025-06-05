@@ -90,10 +90,11 @@ router.post('/', async (req, res) => {
       userId,
       productId,
       quantity,
-      status || '결제완료',
+      "배송준비중",  // ✅ 여기 고정
       productTitle,
       productImage
     ]);
+
 
     // ✅ 재고 확인
     const [check] = await db.execute('SELECT stock FROM products WHERE id = ?', [productId]);

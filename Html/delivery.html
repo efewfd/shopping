@@ -117,17 +117,24 @@
   </div>
 
 <script>
-  // 기존 배송 상태 로딩 외에 추천 상품 이미지 로딩도 포함
   window.addEventListener("DOMContentLoaded", async () => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-
-    // 배송 상태 불러오기
     try {
-      const res = await fetch(`/api/orders/${userId}`);
+      // ✅ 세션 기반 사용자 확인
+      const authRes = await fetch("/api/auth/user", { credentials: "include" });
+      const authData = await authRes.json();
+      if (!authData.loggedIn) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "/Login.html";
+        return;
+      }
+
+      const userId = authData.user.userId;
+
+      // ✅ 배송 상태 불러오기
+      const res = await fetch(`/api/orders/${userId}`, {
+        credentials: "include",
+        cache: "no-store"
+      });
       if (!res.ok) throw new Error("주문 정보 조회 실패");
 
       const orders = await res.json();
@@ -141,8 +148,10 @@
       };
 
       orders.forEach(order => {
-        if (counts[order.status] !== undefined) {
-          counts[order.status]++;
+        console.log("🧾 주문 상태:", order.status);
+        const status = order.status?.trim();
+        if (counts[status] !== undefined) {
+          counts[status]++;
         }
       });
 
@@ -152,41 +161,40 @@
 
       document.getElementById("status-footer").textContent =
         `취소: ${counts["취소"]}    교환: ${counts["교환"]}    반품: ${counts["반품"]}`;
-
     } catch (err) {
       console.error("배송 현황 로딩 실패:", err);
     }
-    // 추천 상품 이미지 로딩
-  try {
-    const res = await fetch("/api/products/random-products?count=5");
-    const products = await res.json();
-    if (!Array.isArray(products) || products.length === 0) return;
 
-    const imgElement = document.getElementById("recommend-image");
-    const linkElement = document.getElementById("recommend-link");
-    let index = 0;
+    // ✅ 추천 이미지 슬라이드
+    try {
+      const res = await fetch("/api/products/random-products?count=5");
+      const products = await res.json();
+      if (!Array.isArray(products) || products.length === 0) return;
 
-    const updateImage = () => {
-      imgElement.style.opacity = 0;
-      setTimeout(() => {
-        const product = products[index];
-        imgElement.src = product.image_url;
-        imgElement.alt = product.name;
-        linkElement.href = `/productDetail.html?id=${product._id}`; // ✅ 상세페이지 링크 설정
-        imgElement.style.opacity = 1;
+      const imgElement = document.getElementById("recommend-image");
+      const linkElement = document.getElementById("recommend-link");
+      let index = 0;
 
-        index = (index + 1) % products.length;
-      }, 200);
-    };
+      const updateImage = () => {
+        imgElement.style.opacity = 0;
+        setTimeout(() => {
+          const product = products[index];
+          imgElement.src = product.image_url;
+          imgElement.alt = product.name;
+          linkElement.href = `/productDetail.html?id=${product._id}`;
+          imgElement.style.opacity = 1;
+          index = (index + 1) % products.length;
+        }, 200);
+      };
 
-    updateImage();
-    setInterval(updateImage, 3000);
-  } catch (err) {
-    console.error("추천 이미지 슬라이드 오류:", err);
-  }
-
+      updateImage();
+      setInterval(updateImage, 3000);
+    } catch (err) {
+      console.error("추천 이미지 슬라이드 오류:", err);
+    }
   });
 </script>
+
 
 </body>
 </html>
