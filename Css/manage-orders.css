@@ -1,0 +1,100 @@
+/* 공통 레이아웃 */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+main {
+  padding: 30px;
+}
+
+/* 제목 스타일 */
+h2 {
+  margin-top: 0;
+  border-left: 5px solid #007bff;
+  padding-left: 10px;
+  font-size: 20px;
+}
+
+/* 테이블 스타일 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+}
+
+td {
+  background-color: #fff;
+}
+
+/* 버튼 스타일 */
+button {
+  padding: 6px 12px;
+  margin: 2px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:nth-child(1) {
+  background-color: #17a2b8; /* 배송중 */
+}
+
+button:nth-child(2) {
+  background-color: #28a745; /* 배송완료 */
+}
+
+/* 주문 상태 강조 색상 */
+td[style*="배송완료"] {
+  font-weight: bold;
+  color: green !important;
+}
+
+td[style*="배송중"] {
+  font-weight: bold;
+  color: blue !important;
+}

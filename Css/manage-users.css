@@ -1,20 +1,76 @@
 /* 회원 테이블 전체 스타일 */
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+main {
+  padding: 30px;
+}
+
 #user-table {
   width: 100%;
-  border-collapse: collapse; /* 셀 경계 중첩 제거 */
-  margin-top: 20px; /* 표 위에 여백 */
+  border-collapse: collapse;
+  margin: 30px auto;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-/* 헤더와 셀에 간격과 테두리 */
+/* 테이블 헤더 */
+#user-table thead {
+  background-color: #f1f1f1;
+}
+
 #user-table th,
 #user-table td {
-  padding: 10px 16px; /* 좌우 여백 넉넉하게 */
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
 }
 
-/* 헤더 강조 */
-#user-table thead {
-  background-color: #f9f9f9;
+#user-table button {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 2px;
   font-weight: bold;
+  color: white;
+}
+
+/* 상태에 따라 다른 색상 */
+#user-table button.lock-btn {
+  background-color: #ffc107; /* 노란색: 잠금 */
+  color: black;
+}
+
+#user-table button.unlock-btn {
+  background-color: #28a745; /* 초록색: 해제 */
+}
+
+#user-table button.delete-btn {
+  background-color: #dc3545; /* 빨간색: 삭제 */
+}
+
+/* hover 효과 */
+#user-table button:hover {
+  opacity: 0.9;
 }

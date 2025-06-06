@@ -96,7 +96,7 @@ router.post('/', upload.fields([
 ]), async (req, res) => {
   try {
     console.log("[폼 데이터 수신]", req.body);
-    const { id, name, price, stock, category1, category2 } = req.body;
+    const { id, name, price, stock, category1, category2, deliveryStartDate } = req.body;
     const parsedPrice = parseInt(price, 10);
     const parsedStock = parseInt(stock, 10);
 
@@ -115,18 +115,29 @@ router.post('/', upload.fields([
       stock: parsedStock,
       image_url,
       category1,
-      category2: category2List
+      category2: category2List,
+      deliveryStartDate: deliveryStartDate || null  // ✅ Mongo에 같이 저장하고 싶으면
     };
 
     // MongoDB 저장
     const product = new Product(productData);
     await product.save();
 
-    // MySQL 저장
+    // ✅ MySQL 저장에 날짜 컬럼 포함
     await db.execute(`
-      INSERT INTO products (id, name, price, image_url, stock, category1, category2)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [productId, name, parsedPrice, image_url, parsedStock, category1, category2List.join(',')]);
+      INSERT INTO products (
+        id, name, price, image_url, stock, category1, category2, delivery_start_date
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      productId,
+      name,
+      parsedPrice,
+      image_url,
+      parsedStock,
+      category1,
+      category2List.join(','),
+      deliveryStartDate || null   // ✅ 전달된 날짜 (없으면 null)
+    ]);
 
     res.json({ message: '상품 등록 완료', product });
 
@@ -135,6 +146,7 @@ router.post('/', upload.fields([
     res.status(500).json({ message: '상품 등록 실패', error: err.message });
   }
 });
+
 
 
 // ✅ 상품 수정 (MySQL + MongoDB)

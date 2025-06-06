@@ -1,0 +1,122 @@
+/* FAQ 관리: 전체 레이아웃 */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+main {
+  padding: 30px;
+}
+
+h2 {
+  margin: 30px 20px 10px;
+  border-left: 5px solid #007bff;
+  padding-left: 10px;
+  font-size: 20px;
+}
+
+/* FAQ 등록 폼 */
+form#faq-form {
+  background: white;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  max-width: 600px;
+}
+
+form#faq-form label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+form#faq-form input[type="text"],
+form#faq-form textarea,
+form#faq-form select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+form#faq-form button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-weight: bold;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+form#faq-form button:hover {
+  background-color: #0056b3;
+}
+
+/* FAQ 리스트 */
+#faq-list {
+  margin: 20px;
+  max-width: 800px;
+}
+
+.faq-item {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.faq-item strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.faq-item p {
+  margin: 0 0 10px;
+  color: #555;
+  white-space: pre-line;
+}
+
+/* 삭제 버튼 */
+.faq-item button {
+  padding: 6px 12px;
+  font-size: 13px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.faq-item button:hover {
+  opacity: 0.9;
+}

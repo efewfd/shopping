@@ -36,6 +36,26 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('.product-code').textContent = `상품번호: ${productId}`;
     document.querySelector('.product-title').textContent = product.name;
     document.querySelector('.original-price').textContent = `${parseInt(product.price).toLocaleString()}원`;
+    const deliveryElement = document.querySelector('.delivery');
+
+    
+    const startDate = new Date(product.delivery_start_date);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (!product.delivery_start_date) {
+      deliveryElement.textContent = '출발일 정보 없음';
+      return;
+    }
+    if (today >= startDate) {
+      deliveryElement.textContent = '오늘출발 가능';
+    } else {
+      const yyyy = startDate.getFullYear();
+      const mm = String(startDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(startDate.getDate()).padStart(2, '0');
+      deliveryElement.textContent = `${mm}월 ${dd}일 출발 예정`;
+      deliveryElement.classList.add('tag', 'today'); // 스타일링 가능
+    }
 
     if (!product || !product.image_url) throw new Error("상품이 존재하지 않거나 이미지 정보 없음");
 
