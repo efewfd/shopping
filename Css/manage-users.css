@@ -1,109 +1,76 @@
-/* ✅ 회원 관리 테이블 스타일 */
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f4f6f8;
-  margin: 0;
-  padding: 0;
-}
-
+/* 회원 테이블 전체 스타일 */
 
 nav ul {
   list-style: none;
   display: flex;
   gap: 20px;
-  padding: 0;
-  margin: 20px 0 0 0;
+  padding-left: 0;
+  margin-top: 10px;
 }
 
 nav ul li a {
   color: white;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 nav ul li a:hover {
-  color: #000000;
+  text-decoration: underline;
 }
 
 main {
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
-
-h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
+  padding: 30px;
 }
 
 #user-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin: 30px auto;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 10px;
   overflow: hidden;
-  margin-top: 32px;
+}
+
+/* 테이블 헤더 */
+#user-table thead {
+  background-color: #f1f1f1;
 }
 
 #user-table th,
 #user-table td {
-  padding: 14px 16px;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
   text-align: center;
-  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
 }
 
-#user-table thead {
-  background-color: #ecf0f1;
-}
-
-#user-table tr:hover {
-  background-color: #fdfdfd;
-}
-
-/* ✅ 삭제 버튼 (빨강) */
-button.delete-btn {
+#user-table button {
   padding: 6px 12px;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 13px;
-  transition: background-color 0.2s;
-  margin: 2px 4px;
-}
-
-button.delete-btn:hover {
-  background-color: #c0392b;
-}
-
-/* ✅ 잠금 버튼 (파랑) */
-button.lock-btn {
-  padding: 6px 12px;
-  background-color: #2980b9;
-  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 13px;
-  transition: background-color 0.2s;
-  margin: 2px 4px;
+  margin: 2px;
+  font-weight: bold;
+  color: white;
 }
 
-button.lock-btn:hover {
-  background-color: #1c598a;
+/* 상태에 따라 다른 색상 */
+#user-table button.lock-btn {
+  background-color: #ffc107; /* 노란색: 잠금 */
+  color: black;
 }
 
-@media screen and (max-width: 768px) {
-  #user-table th,
-  #user-table td {
-    font-size: 13px;
-    padding: 10px;
-  }
+#user-table button.unlock-btn {
+  background-color: #28a745; /* 초록색: 해제 */
+}
 
-  nav ul {
-    flex-direction: column;
-    gap: 10px;
-  }
+#user-table button.delete-btn {
+  background-color: #dc3545; /* 빨간색: 삭제 */
+}
+
+/* hover 효과 */
+#user-table button:hover {
+  opacity: 0.9;
 }

@@ -12,11 +12,15 @@ window.addEventListener('DOMContentLoaded', async () => {
       <td>${user.email || '-'}</td>
       <td>${new Date(user.created_at).toLocaleDateString()}</td>
       <td>
-        <button class="lock-btn" onclick="${user.is_active ? `deactivateUser('${user.user_id}')` : `activateUser('${user.user_id}')`}">
+        <button 
+          class="${user.is_active ? 'lock-btn' : 'unlock-btn'}" 
+          onclick="${user.is_active ? `deactivateUser('${user.user_id}')` : `activateUser('${user.user_id}')`}">
           ${user.is_active ? '잠금' : '해제'}
         </button>
         <button class="delete-btn" onclick="deleteUser('${user.user_id}')">삭제</button>
+        <button class="delete-btn" onclick="deleteUser('${user.user_id}')">삭제</button>
       </td>
+
     `;
     tbody.appendChild(row);
   });

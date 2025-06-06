@@ -109,3 +109,13 @@ select {
 .btn-buy:hover {
   background-color: #c62828;
 }
+.tag.today {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #f5f5f5;
+  color: #2c3e50;
+  font-weight: bold;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 6px;
+}

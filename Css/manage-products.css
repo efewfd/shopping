@@ -95,3 +95,130 @@ img {
   max-width: 60px;
   border-radius: 6px;
 }
+
+/* admin.css */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav ul li a:hover {
+  text-decoration: underline;
+}
+
+main {
+  padding: 30px;
+}
+
+section {
+  background: white;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-top: 0;
+  border-left: 5px solid #007bff;
+  padding-left: 10px;
+  font-size: 20px;
+}
+
+form input,
+form select {
+  margin: 8px 0;
+  padding: 10px;
+  font-size: 14px;
+  width: calc(100% - 20px);
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+form input[type="file"] {
+  padding: 5px;
+}
+
+form button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #f1f1f1;
+}
+
+td img {
+  max-height: 60px;
+  object-fit: cover;
+}
+
+td input {
+  width: 80%;
+  padding: 5px;
+  font-size: 13px;
+}
+
+button {
+  padding: 6px 12px;
+  margin: 2px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:nth-child(1) {
+  background-color: #ffc107; /* 수정 */
+  color: black;
+}
+
+button:nth-child(2) {
+  background-color: #dc3545; /* 삭제 */
+  color: white;
+}
