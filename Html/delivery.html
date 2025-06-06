@@ -119,7 +119,7 @@
 <script>
   window.addEventListener("DOMContentLoaded", async () => {
     try {
-      // ✅ 세션 기반 사용자 확인
+      // ✅ 로그인 확인
       const authRes = await fetch("/api/auth/user", { credentials: "include" });
       const authData = await authRes.json();
       if (!authData.loggedIn) {
@@ -130,7 +130,7 @@
 
       const userId = authData.user.userId;
 
-      // ✅ 배송 상태 불러오기
+      // ✅ 주문 정보 요청
       const res = await fetch(`/api/orders/${userId}`, {
         credentials: "include",
         cache: "no-store"
@@ -138,7 +138,10 @@
       if (!res.ok) throw new Error("주문 정보 조회 실패");
 
       const orders = await res.json();
+
+      // ✅ 상태 카운터 초기화
       const counts = {
+        "결제완료": 0,
         "배송준비중": 0,
         "배송중": 0,
         "배송완료": 0,
@@ -147,20 +150,36 @@
         "반품": 0
       };
 
+      // ✅ 상태 라벨 (필요시 확장용)
+      const statusLabel = {
+        "결제완료": "🧾 결제 완료",
+        "배송준비중": "📦 배송 준비 중",
+        "배송중": "🚚 배송 중",
+        "배송완료": "✅ 배송 완료",
+        "취소": "❌ 취소",
+        "교환": "🔁 교환",
+        "반품": "↩️ 반품"
+      };
+
       orders.forEach(order => {
-        console.log("🧾 주문 상태:", order.status);
-        const status = order.status?.trim();
-        if (counts[status] !== undefined) {
+        const rawStatus = order.status ?? "결제완료";
+        const status = rawStatus.toString().trim();
+
+        if (counts.hasOwnProperty(status)) {
           counts[status]++;
         }
+        console.log(`📦 주문 상태: ${statusLabel[status] || status}`);
       });
 
+      // ✅ 상단 숫자 표시
       document.getElementById("prep-count").textContent = counts["배송준비중"];
       document.getElementById("shipping-count").textContent = counts["배송중"];
       document.getElementById("complete-count").textContent = counts["배송완료"];
 
+      // ✅ 하단 요약 표시
       document.getElementById("status-footer").textContent =
         `취소: ${counts["취소"]}    교환: ${counts["교환"]}    반품: ${counts["반품"]}`;
+
     } catch (err) {
       console.error("배송 현황 로딩 실패:", err);
     }

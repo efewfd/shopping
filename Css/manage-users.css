@@ -1,20 +1,109 @@
-/* 회원 테이블 전체 스타일 */
+/* ✅ 회원 관리 테이블 스타일 */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f8;
+  margin: 0;
+  padding: 0;
+}
+
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding: 0;
+  margin: 20px 0 0 0;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav ul li a:hover {
+  color: #000000;
+}
+
+main {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
 #user-table {
   width: 100%;
-  border-collapse: collapse; /* 셀 경계 중첩 제거 */
-  margin-top: 20px; /* 표 위에 여백 */
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-top: 32px;
 }
 
-/* 헤더와 셀에 간격과 테두리 */
 #user-table th,
 #user-table td {
-  padding: 10px 16px; /* 좌우 여백 넉넉하게 */
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+  padding: 14px 16px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-/* 헤더 강조 */
 #user-table thead {
-  background-color: #f9f9f9;
-  font-weight: bold;
+  background-color: #ecf0f1;
+}
+
+#user-table tr:hover {
+  background-color: #fdfdfd;
+}
+
+/* ✅ 삭제 버튼 (빨강) */
+button.delete-btn {
+  padding: 6px 12px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+  margin: 2px 4px;
+}
+
+button.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+/* ✅ 잠금 버튼 (파랑) */
+button.lock-btn {
+  padding: 6px 12px;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+  margin: 2px 4px;
+}
+
+button.lock-btn:hover {
+  background-color: #1c598a;
+}
+
+@media screen and (max-width: 768px) {
+  #user-table th,
+  #user-table td {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

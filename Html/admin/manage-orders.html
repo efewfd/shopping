@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>주문 관리</title>
   <link rel="stylesheet" href="../../Css/admin.css" />
+  <link rel="stylesheet" href="../../Css/manage-orders.css" />
   <style>
     table {
       width: 100%;
@@ -61,37 +62,44 @@
   </main>
 
   <script>
-    window.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const res = await fetch("/api/orders");
-        if (!res.ok) throw new Error("주문 목록 로드 실패");
-        const orders = await res.json();
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/api/orders");
+    if (!res.ok) throw new Error("주문 목록 로드 실패");
+    const orders = await res.json();
 
-        const list = document.getElementById("order-list");
-list.innerHTML = orders.map(order => `
-  <tr>
-    <td>${order.id}</td>
-    <td>${order.user_id}</td>
-    <td>${order.user_name || '-'}</td>
-    <td>${order.product_id}</td>
-    <td>${order.product_title || '-'}</td> <!-- ✅ 여기 수정 -->
-    <td>${order.quantity}</td>
-    <td>${order.status}</td>
-    <td>${new Date(order.created_at).toLocaleString()}</td>
-    <td style="color: ${order.status === '배송완료' ? 'green' : order.status === '배송중' ? 'blue' : 'black'}">
-  ${order.status}>
-      <button onclick="updateStatus(${order.id}, '배송중')">배송중</button>
-      <button onclick="updateStatus(${order.id}, '배송완료')">배송완료</button>
-    </td>
-  </tr>
-`).join("");
+    const list = document.getElementById("order-list");
+    list.innerHTML = orders.map(order => {
+      const statusColor = {
+        '배송완료': 'green',
+        '배송중': 'blue',
+        '배송준비중': 'orange'
+      };
 
+      return `
+        <tr>
+          <td>${order.id}</td>
+          <td>${order.user_id}</td>
+          <td>${order.user_name || '-'}</td>
+          <td>${order.product_id}</td>
+          <td>${order.product_title || '-'}</td>
+          <td>${order.quantity}</td>
+          <td style="color: ${statusColor[order.status] || 'black'}">${order.status}</td>
+          <td>${new Date(order.created_at).toLocaleString()}</td>
+          <td>
+            <button onclick="updateStatus(${order.id}, '배송준비중')">배송준비</button>
+            <button onclick="updateStatus(${order.id}, '배송중')">배송중</button>
+            <button onclick="updateStatus(${order.id}, '배송완료')">배송완료</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  } catch (err) {
+    alert("주문 목록을 불러오지 못했습니다.");
+    console.error(err);
+  }
+});
 
-      } catch (err) {
-        alert("주문 목록을 불러오지 못했습니다.");
-        console.error(err);
-      }
-    });
 
     async function updateStatus(orderId, newStatus) {
       try {

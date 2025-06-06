@@ -1,0 +1,132 @@
+/* ✅ FAQ 관리 페이지 스타일 */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f7f9fc;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding: 0;
+  margin: 20px 0 0 0;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+nav ul li a:hover {
+  color: #000000;
+}
+
+h2 {
+  margin: 30px 20px 10px;
+  font-size: 20px;
+}
+
+form {
+  margin: 20px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  max-width: 600px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+form input,
+form textarea,
+form select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+form button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #2980b9;
+}
+
+#faq-list {
+  margin: 20px;
+  max-width: 800px;
+}
+
+.faq-item {
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+}
+
+.faq-item strong {
+  display: block;
+  font-size: 16px;
+  color: #2c3e50;
+  margin-bottom: 6px;
+}
+
+.faq-item p {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.faq-item button {
+  padding: 6px 12px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.faq-item button:hover {
+  background-color: #c0392b;
+}
+
+@media screen and (max-width: 768px) {
+  form, #faq-list {
+    margin: 10px;
+    padding: 16px;
+  }
+
+  form input,
+  form textarea,
+  form select {
+    font-size: 13px;
+  }
+
+  .faq-item {
+    padding: 12px;
+  }
+}

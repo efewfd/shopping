@@ -148,8 +148,9 @@ mongoose.connect(
     socket.on('join', async (data) => {
       console.log('🟡 join 이벤트:', data);
 
+      // ✅ 관리자일 경우
       if (data?.type === 'admin') {
-        adminSockets.add(socket); // ✅ 관리자 소켓 등록
+        adminSockets.add(socket);
         socket.join('admin');
         console.log('🔵 관리자 접속:', socket.id);
         console.log('👥 현재 관리자 수:', adminSockets.size);
@@ -159,6 +160,7 @@ mongoose.connect(
           socket.emit('new-customer', {
             id: status.customerId,
             name: status.name,
+            userId: status.userId, // ✅ 관리자에게 userId도 전달
             isEnded: status.isEnded
           });
         });
@@ -181,29 +183,39 @@ mongoose.connect(
         socket.emit('update-forbidden-list', forbiddenWords);
       }
 
+      // ✅ 고객일 경우
       else if (data?.type === 'customer') {
         const name = (data.name || '').trim();
-        if (!name) return;
+        const userId = (data.userId || '').trim();
+
+        if (!name || !userId) return;
 
         customers[socket.id] = socket;
         customerNames[socket.id] = name;
         socket.emit('your-id', socket.id);
 
+        // ✅ userId도 함께 저장
         await CustomerStatus.findOneAndUpdate(
           { customerId: socket.id },
-          { name, isEnded: false, endedAt: null },
+          { name, userId, isEnded: false, endedAt: null },
           { upsert: true }
         );
 
-        // ✅ 관리자에게 고객 목록 전송
+        // ✅ 관리자에게 고객 정보 전달
         adminSockets.forEach(admin => {
-          admin.emit('new-customer', { id: socket.id, name, isEnded: false });
+          admin.emit('new-customer', {
+            id: socket.id,
+            name,
+            userId,
+            isEnded: false
+          });
         });
 
         const logs = await ChatLog.find({ customerId: socket.id }).sort({ time: 1 });
         socket.emit('chat-history', logs);
       }
     });
+
 
 
 

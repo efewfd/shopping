@@ -64,6 +64,8 @@ const hasNewMsg = {};
 const allCustomers = [];
 let forbiddenWords = [];
 const renderedMsgIds = new Set();
+const customerUserIds = {}; // ✅ userId 저장용
+
 
 // ✅ 메시지 전송 처리
 function sendMsg() {
@@ -240,7 +242,8 @@ function renderCustomerList() {
 
   allCustomers.forEach(({ id, name, isEnded }) => {
     const btn = document.createElement('button');
-    btn.textContent = `${name} (${id.slice(0, 4)})`;
+    const displayUserId = customerUserIds[id] || 'guest';
+    btn.textContent = `${name} (${displayUserId.slice(0, 6)})`;
     btn.dataset.id = id;
     btn.onclick = () => selectCustomer(id);
 
@@ -262,17 +265,21 @@ function renderCustomerList() {
 }
 
 // ✅ 새 고객 접속
-socket.on('new-customer', ({ id, name, isEnded = false }) => {
-  console.log('🟢 new-customer 수신:', id, name);
+socket.on('new-customer', ({ id, name, userId, isEnded = false }) => {
+  console.log('🟢 new-customer 수신:', id, name, userId);
   customerNames[id] = name;
+  customerUserIds[id] = userId; // ✅ 추가
+
   chatLogs[id] = chatLogs[id] || [];
 
   const exists = allCustomers.find(c => c.id === id);
   if (!exists) {
-    allCustomers.push({ id, name, isEnded });
+    allCustomers.push({ id, name, userId, isEnded }); // ✅ userId 포함
   }
+
   renderCustomerList();
 });
+
 
 // ✅ 종료 처리
 socket.on('inquiry-ended', (id) => {

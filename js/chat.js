@@ -16,17 +16,22 @@ socket.on('update-forbidden-list', (list) => {
    forbiddenWords = list;
 });
 
-let userName = '';
-while (!userName.trim()) {
-   userName = prompt('이름을 입력해주세요');
-   if (userName === null) {
-      alert('상담을 이용하시려면 이름을 입력해야 합니다.');
-      window.location.href = '/';
-      throw new Error('이름 입력 없음으로 채팅 종료');
-   }
-}
 
-socket.emit('join', { type: 'customer', name: userName });
+async function getUserInfo() {
+  try {
+    const res = await fetch('/api/auth/user', { credentials: 'include' });
+    const data = await res.json();
+    if (data.loggedIn) {
+      return {
+        name: data.user.name,
+        userId: data.user.userId
+      };
+    }
+  } catch (err) {
+    console.error('❌ 사용자 정보 불러오기 실패:', err);
+  }
+  return null;
+}
 
 function containsForbiddenWords(message) {
    if (!Array.isArray(forbiddenWords) || forbiddenWords.length === 0) return false;
@@ -206,18 +211,19 @@ socket.on('chat-history', (logs) => {
    }
 });
 
-// input.addEventListener('keydown', e => {
-//    if (e.key === 'Enter' && !e.shiftKey) {
-//       e.preventDefault();
-//       sendMsg();
-//    }
-// });
-document.addEventListener('DOMContentLoaded', () => {
-   const input = document.getElementById('msgInput');
-   input.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-         e.preventDefault();
-         sendMsg();
-      }
-   });
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const user = await getUserInfo();
+
+  if (!user) {
+    alert('로그인 후 이용해주세요.');
+    location.href = '/Login.html';
+    return;
+  }
+
+  socket.emit('join', {
+    type: 'customer',
+    name: user.name,
+    userId: user.userId
+  });
 });

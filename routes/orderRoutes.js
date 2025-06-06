@@ -63,15 +63,9 @@ router.get('/:userId', async (req, res) => {
 
 // 주문 저장 API
 router.post('/', async (req, res) => {
-  const { userId, productId, status, product } = req.body;
+  const { userId, productId, product } = req.body;
   const rawQuantity = req.body.quantity;
   const quantity = parseInt(rawQuantity, 10);
-
-  console.log("📦 요청 바디 전체:", req.body);
-  console.log("📦 userId:", userId);
-  console.log("📦 productId:", productId);
-  console.log("📦 quantity:", quantity);
-  console.log("📦 product.title:", product?.title);
 
   const productTitle = (typeof product?.title === 'string' ? product.title.trim() : '') || "제목없음";
   const productImage = product?.image || null;
@@ -81,7 +75,7 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    // ✅ MySQL에 주문 등록
+    // ✅ status는 무조건 '배송준비중'으로 저장
     await db.execute(`
       INSERT INTO orders (
         user_id, product_id, quantity, status, product_title, product_image
@@ -90,24 +84,18 @@ router.post('/', async (req, res) => {
       userId,
       productId,
       quantity,
-      "배송준비중",  // ✅ 여기 고정
+      "결제완료",  // ✅ 기본은 결제완료로 시작
       productTitle,
       productImage
     ]);
 
 
-    // ✅ 재고 확인
-    const [check] = await db.execute('SELECT stock FROM products WHERE id = ?', [productId]);
-    console.log("🔎 현재 MySQL 재고 조회:", check);
-
-    // ✅ MySQL 재고 차감
+    // ✅ 재고 차감
     const [result] = await db.execute(`
       UPDATE products
       SET stock = stock - ?
       WHERE id = ? AND stock >= ?
     `, [quantity, productId, quantity]);
-
-    console.log("🛠 UPDATE 결과 affectedRows:", result.affectedRows);
 
     if (result.affectedRows === 0) {
       return res.status(400).json({ message: '재고 부족으로 주문이 실패했습니다.' });
@@ -124,14 +112,25 @@ router.post('/', async (req, res) => {
 
 
 
+
 // PATCH /api/orders/:id
 router.patch('/:id', async (req, res) => {
   const { status } = req.body;
   const orderId = req.params.id;
 
-  await db.execute('UPDATE orders SET status = ? WHERE id = ?', [status, orderId]);
-  res.json({ message: '상태가 변경되었습니다.' });
+  if (!['배송준비중', '배송중', '배송완료'].includes(status)) {
+    return res.status(400).json({ message: '잘못된 상태 값입니다.' });
+  }
+
+  try {
+    await db.execute('UPDATE orders SET status = ? WHERE id = ?', [status, orderId]);
+    res.json({ message: '상태가 변경되었습니다.' });
+  } catch (err) {
+    console.error('🛑 상태 변경 실패:', err);
+    res.status(500).json({ message: '서버 오류' });
+  }
 });
+
 
 
 
