@@ -1,12 +1,9 @@
-const mongoose = require('mongoose');
+module.exports = (conn) => {
+  const mongoose = require('mongoose');
 
-const forbiddenWordSchema = new mongoose.Schema({
-  customerId: String,
-  sender: String,
-  message: String,
-  messageId: String,
-  read: { type: Boolean, default: false },
-  time: { type: Date, default: Date.now }
-});
+  const ForbiddenWordSchema = new mongoose.Schema({
+    word: { type: String, required: true, unique: true }
+  });
 
-module.exports = mongoose.model('ForbiddenWord', forbiddenWordSchema);
+  return conn.model('ForbiddenWord', ForbiddenWordSchema);
+};

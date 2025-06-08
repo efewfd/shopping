@@ -81,7 +81,7 @@ function containsForbiddenWords(message) {
 
 // ✅ MongoDB 연결 및 서버/소켓 초기화
 mongoose.connect(
-  'mongodb+srv://cd1:capstonedesign1@cluster0.snijqi4.mongodb.net/chatdb?retryWrites=true&w=majority&appName=Cluster0', {}
+  '', {}
 ).then(async () => {
   console.log('✅ MongoDB 연결 완료');
 
