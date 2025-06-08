@@ -109,12 +109,15 @@ chatDB.once('open', async () => {
         }
 
         // ✅ 고객 상태 확인
-        const status = await CustomerStatus.findOne({ customerId: socket.id });
+        const status = await CustomerStatus.findOne({ userId: socket.userId });
+        const customerId = status?.customerId;
+        console.log('[디버그] customerId →', customerId);
+
         if (status && status.isEnded) return;
 
         // ✅ 로그 저장
         const newLog = await ChatLog.create({
-          customerId: socket.id,
+          customerId,
           sender: 'customer',
           message: msg.msg,
           messageId: msg.messageId,
@@ -126,7 +129,7 @@ chatDB.once('open', async () => {
         const customerName = customerNames[socket.id] || status?.name || '고객';
 
         console.log('📤 관리자에게 emit 준비:', {
-          customerId: socket.id,
+          customerId,
           name: customerName,
           msg: msg.msg
         });
@@ -140,7 +143,7 @@ chatDB.once('open', async () => {
         setTimeout(() => {
           adminSockets.forEach(admin => {
             admin.emit('message-from-customer', {
-              customerId: socket.id,
+              customerId,
               name: customerName,
               msg: msg.msg,
               messageId: msg.messageId,
@@ -151,31 +154,43 @@ chatDB.once('open', async () => {
         }, 10); // 10~20ms 딜레이
       });
 
+      // ✅ 관리자 메시지 → 고객에게
+      socket.on('message-to-customer', async ({ to, message, messageId }) => {
+        const id = messageId || uuidv4();
 
-    // ✅ 관리자 메시지 → 고객에게
-    socket.on('message-to-customer', async ({ to, message, messageId }) => {
-      const id = messageId || uuidv4();
-      const status = await CustomerStatus.findOne({ customerId: to });
-      if (status?.isEnded) return;
+        // 1. DB에서 customerStatus 조회
+        const status = await CustomerStatus.findOne({ customerId: to });
+        if (!status || status.isEnded) return;
 
-      const newLog = await ChatLog.create({
-        customerId: to,
-        sender: 'admin',
-        message,
-        messageId: id,
-        read: false,
-        time: new Date()
-      });
-
-      if (customers[to]) {
-        customers[to].emit('message-from-admin', {
+        // 2. 로그 저장
+        const newLog = await ChatLog.create({
+          customerId: to,
+          sender: 'admin',
           message,
           messageId: id,
-          customerId: to,
-          time: newLog.time
+          read: false,
+          time: new Date()
         });
-      }
-    });
+
+        // 3. 현재 접속 중인 socket.id 찾기
+        const customerSocket = Object.entries(customers).find(([socketId, info]) => {
+          return info.customerId === to;
+        });
+
+        if (customerSocket) {
+          const [socketId, { socket }] = customerSocket;
+
+          socket.emit('message-from-admin', {
+            message,
+            messageId: id,
+            customerId: to,
+            time: newLog.time
+          });
+        } else {
+          console.warn('⚠️ 고객 socket 연결 안됨:', to);
+        }
+      });
+
 
     // ✅ join 처리
     socket.on('join', async (data) => {
@@ -188,15 +203,20 @@ chatDB.once('open', async () => {
         console.log('🔵 관리자 접속:', socket.id);
         console.log('👥 현재 관리자 수:', adminSockets.size);
 
-        const statuses = await CustomerStatus.find();
+        const statuses = await CustomerStatus.find({ isEnded: false });
+        const seen = new Set();
         statuses.forEach(status => {
-          socket.emit('new-customer', {
-            id: status.customerId,
-            name: status.name,
-            userId: status.userId, // ✅ 관리자에게 userId도 전달
-            isEnded: status.isEnded
-          });
+          if (!seen.has(status.userId)) {
+            seen.add(status.userId);
+            socket.emit('new-customer', {
+              id: status.customerId,
+              name: status.name,
+              userId: status.userId,
+              isEnded: false
+            });
+          }
         });
+
 
         const logs = await ChatLog.find().sort({ time: 1 });
         const grouped = {};
@@ -222,32 +242,54 @@ chatDB.once('open', async () => {
         const userId = (data.userId || '').trim();
 
         if (!name || !userId) return;
+        socket.userId = userId;
+        // ✅ 기존 customerId가 있는지 확인
+        let customerStatus = await CustomerStatus.findOne({ userId });
 
-        customers[socket.id] = socket;
+        if (!customerStatus) {
+          // 새로 생성할 때만 socket.id 사용
+          customerStatus = await CustomerStatus.create({
+            customerId: socket.id,
+            name,
+            userId,
+            isEnded: false,
+            endedAt: null
+          });
+        } else {
+          // ✅ 기존 customerId 유지! socket.id 덮지 마!
+          customerStatus.name = name;
+          customerStatus.isEnded = false;
+          customerStatus.endedAt = null;
+          await customerStatus.save();
+        }
+
+        const customerId = customerStatus.customerId;
+
+        customers[socket.id] = {
+          socket,
+          customerId: customerStatus.customerId
+        };
         customerNames[socket.id] = name;
-        socket.emit('your-id', socket.id);
-
-        // ✅ userId도 함께 저장
-        await CustomerStatus.findOneAndUpdate(
-          { customerId: socket.id },
-          { name, userId, isEnded: false, endedAt: null },
-          { upsert: true }
-        );
+        socket.emit('your-id', customerId);
 
         // ✅ 관리자에게 고객 정보 전달
         adminSockets.forEach(admin => {
           admin.emit('new-customer', {
-            id: socket.id,
+            id: customerStatus.customerId,
             name,
             userId,
             isEnded: false
           });
         });
 
-        const logs = await ChatLog.find({ customerId: socket.id }).sort({ time: 1 });
+
+        // ✅ 기존 채팅 로그 전달
+        const logs = await ChatLog.find({ customerId }).sort({ time: 1 });
         socket.emit('chat-history', logs);
       }
     });
+
+
     // ✅ 메시지 읽음 처리
     socket.on('message-read', async ({ customerId, messageIds }) => {
       await ChatLog.updateMany(
@@ -316,14 +358,15 @@ chatDB.once('open', async () => {
 
     // ✅ 연결 해제 처리
     socket.on('disconnect', () => {
-      if (customers[socket.id]) {
+      const disconnectedUser = customers[socket.id];
+      if (disconnectedUser) {
+        const customerId = disconnectedUser.customerId;
         delete customers[socket.id];
         delete customerNames[socket.id];
         adminSockets.forEach(admin => {
-          admin.emit('customer-disconnected', socket.id);
+          admin.emit('customer-disconnected', customerId);
         });
       }
-
       if (adminSockets.has(socket)) {
         adminSockets.delete(socket);
         console.log('🛑 관리자 연결 해제:', socket.id);
