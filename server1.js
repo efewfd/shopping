@@ -6,7 +6,7 @@ const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const userRoutes = require('./routes/user'); // 경로 맞게 수정
-const faqRoutes = require('./routes/faq');
+
 const orderRoutes = require('./routes/orderRoutes');
 const db = require('./js/db');
 const reviewRoutes = require('./routes/reviewRoutes');
@@ -40,8 +40,10 @@ shopDB.once('open', () => {
   // ✅ 정확히 여기에서 인기상품 라우터 등록
   const productRoutes = require('./routes/productRoutes');
   const popularRoutes = require('./routes/popularRoutes')(Models);
+  const faqRoutes = require('./routes/faq')(Models);
   app.use('/api/products/popular', popularRoutes);
   app.use('/api/products', productRoutes);
+  app.use('/api/faqs', faqRoutes);
 
   // ✅ 모든 라우터 등록 끝나고 listen 실행
   server.listen(PORT, () => {
@@ -398,7 +400,7 @@ app.use((req, res, next) => {
 // API 라우터
 app.use(express.static('public'));
 app.use('/api/users', userRoutes);
-app.use('/api/faqs', faqRoutes);
+
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/wishlist', wishlistRoutes);
