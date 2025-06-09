@@ -9,7 +9,7 @@ const userRoutes = require('./routes/user'); // 경로 맞게 수정
 
 const orderRoutes = require('./routes/orderRoutes');
 const db = require('./js/db');
-const reviewRoutes = require('./routes/reviewRoutes');
+
 const http = require('http');
 const wishlistRoutes = require('./routes/wishlist');
 const shopDB = mongoose.createConnection("mongodb://localhost:27017/shopmall", {
@@ -41,9 +41,11 @@ shopDB.once('open', () => {
   const productRoutes = require('./routes/productRoutes');
   const popularRoutes = require('./routes/popularRoutes')(Models);
   const faqRoutes = require('./routes/faq')(Models);
+  const reviewRoutes = require('./routes/reviewRoutes')(Models);
   app.use('/api/products/popular', popularRoutes);
   app.use('/api/products', productRoutes);
   app.use('/api/faqs', faqRoutes);
+  app.use('/api/reviews', reviewRoutes);
 
   // ✅ 모든 라우터 등록 끝나고 listen 실행
   server.listen(PORT, () => {
@@ -402,7 +404,7 @@ app.use(express.static('public'));
 app.use('/api/users', userRoutes);
 
 app.use('/api/orders', orderRoutes);
-app.use('/api/reviews', reviewRoutes);
+
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes); 

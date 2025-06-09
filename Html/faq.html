@@ -129,7 +129,7 @@
           const product = products[index];
           imgElement.src = product.image_url;
           imgElement.alt = product.name;
-          linkElement.href = `/productDetail.html?id=${product._id}`;
+          linkElement.href = `/productDetail.html?id=${product.id}`;
           imgElement.style.opacity = 1;
           index = (index + 1) % products.length;
         }, 200);
