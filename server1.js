@@ -130,7 +130,7 @@ chatDB.once('open', async () => {
         });
 
         // ✅ 이름 확인
-        const customerName = customerNames[socket.id] || status?.name || '고객';
+        const customerName = customerNames[customerId] || status?.name || '고객';
 
         console.log('📤 관리자에게 emit 준비:', {
           customerId,
@@ -273,7 +273,7 @@ chatDB.once('open', async () => {
           socket,
           customerId: customerStatus.customerId
         };
-        customerNames[socket.id] = name;
+        customerNames[customerStatus.customerId] = name;
         socket.emit('your-id', customerId);
 
         // ✅ 관리자에게 고객 정보 전달
