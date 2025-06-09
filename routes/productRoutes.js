@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const multer = require('multer');
 const Product = require('../models/product');
 const crypto = require('crypto'); // UUID용
@@ -20,8 +19,11 @@ const upload = multer({ storage });
 router.get('/random-products', async (req, res) => {
   try {
     const count = parseInt(req.query.count) || 5;
-    const randomProducts = await Product.aggregate([{ $sample: { size: count } }]);
-    res.json(randomProducts);
+    const [rows] = await db.query(
+      'SELECT id, name, image_url FROM products ORDER BY RAND() LIMIT ?',
+      [count]
+    );
+    res.json(rows);
   } catch (err) {
     console.error('❌ 랜덤 상품 조회 실패:', err);
     res.status(500).json({ message: '랜덤 상품 조회 실패' });
