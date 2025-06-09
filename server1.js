@@ -38,7 +38,7 @@ shopDB.once('open', () => {
   Models.Cart = require('./models/cart')(shopDB);
 
   // ✅ 정확히 여기에서 인기상품 라우터 등록
-  const productRoutes = require('./routes/productRoutes');
+  const productRoutes = require('./routes/productRoutes')(Models);
   const popularRoutes = require('./routes/popularRoutes')(Models);
   const faqRoutes = require('./routes/faq')(Models);
   const reviewRoutes = require('./routes/reviewRoutes')(Models);

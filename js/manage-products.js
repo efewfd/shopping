@@ -1,3 +1,5 @@
+
+
 // 1차 카테고리에 따라 2차 카테고리를 자동 변경하는 매핑
 const categoryMap = {
   top: ['basic', 'blouse', 'casual', 'shirt', 'hoddie', 'sweatshirt'],
@@ -67,15 +69,17 @@ async function loadProducts() {
   const products = await res.json();
   const validatedProducts = [];
   const isMongoObjectId = /^[a-f0-9]{24}$/;
-for (const p of products) {
+for (const product of products) {
 let pid;
-if (typeof p.id === 'string') {
-  pid = p.id;
-} else if (typeof p.id === 'object' && typeof p.id.id === 'string') {
-  pid = p.id.id;
+if (typeof product.id === 'string' && product.id) {
+  pid = product.id;
+} else if (typeof product._id === 'string' && product._id) {
+  pid = product._id;
 } else {
-  pid = p._id;
+  console.warn("❌ ID 없음:", product);
+  return; // 이 상품은 스킵
 }
+
 
 
 
