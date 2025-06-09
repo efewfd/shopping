@@ -218,7 +218,15 @@ function selectCustomer(id) {
   const selected = allCustomers.find(c => c.id === id);
   input.disabled = selected?.isEnded;
 
-  const btn = document.querySelector(`button[data-id="${id}"]`);
+// 모든 버튼에서 선택 제거
+document.querySelectorAll('.customer-list button').forEach(b => {
+  b.classList.remove('selected');
+});
+
+// 현재 선택된 버튼에 selected 클래스 추가
+const btn = document.querySelector(`button[data-id="${id}"]`);
+if (btn) btn.classList.add('selected');
+
   if (btn) {
     const dot = btn.querySelector('.user-alert');
     if (dot) btn.removeChild(dot);

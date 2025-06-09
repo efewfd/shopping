@@ -37,4 +37,8 @@ nav ul li a:hover {
     padding: 1rem;
     background-color: #eee;
   }
-  
+  .customer-list button.selected {
+  background-color: #d8eaff;
+  font-weight: bold;
+  border: 2px solid #4a90e2;
+}

@@ -18,9 +18,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           ${user.is_active ? '잠금' : '해제'}
         </button>
         <button class="delete-btn" onclick="deleteUser('${user.user_id}')">삭제</button>
-        <button class="delete-btn" onclick="deleteUser('${user.user_id}')">삭제</button>
       </td>
-
     `;
     tbody.appendChild(row);
   });

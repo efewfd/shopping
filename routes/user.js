@@ -15,12 +15,17 @@ router.get('/all', async (req, res) => {
 // 회원 삭제
 router.post('/delete', async (req, res) => {
   const { userId } = req.body;
-  await User.deleteOne({ userId });
 
-  console.log('[삭제 요청]', userId, result); // 로그 찍기
-
-  res.json({ message: '회원 삭제 완료' });
+  try {
+    const [result] = await db.query('DELETE FROM users WHERE user_id = ?', [userId]);
+    console.log('[삭제 요청]', userId, result);
+    res.json({ message: '회원 삭제 완료' });
+  } catch (err) {
+    console.error('회원 삭제 실패:', err);
+    res.status(500).json({ error: '회원 삭제 실패' });
+  }
 });
+
 
 // [GET] 회원 정보 조회
 router.get('/:id', async (req, res) => {
