@@ -5,12 +5,14 @@ h1, h3 {
 
 .main-section {
   display: flex;
-  gap: 40px;
+  margin-top: 30px;
+  margin-left: 30px;
 }
 
 .side-menu {
   width: 180px;
   border: 1px solid #ccc;
+  height: 238px;
 }
 
 .side-menu ul {
